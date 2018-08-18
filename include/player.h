@@ -6,7 +6,7 @@
 #include <random>
 #include <cmath>
 
-const int NUM_ROLLOUT = 3000;
+const int NUM_ROLLOUT = 10000;
 const double MIN_SCORE = -NUM_ROLLOUT * 100;
 const double PUCT = 0.5;
 const int EXPAND_THRESH = static_cast<int>(0.4 * log(NUM_ROLLOUT));
@@ -31,15 +31,15 @@ public:
 
 private:
     std::unordered_map<Board, ExpandedNode> expandedTree;
-    State me;
     std::random_device seed_gen;
     std::mt19937 engine;
     std::uniform_int_distribution<> dist;
     Jouseki jsk;
 
-    double getScore(const Board& board, int numTotalSelect) const;
+    double getScore(const Board& board, int numTotalSelect,
+                    State parentTurn) const;
     void expand(Board& board, const std::vector<BitBoard>& moveList);
-    double expandedTreeSearch(Board& board, int depth);
+    double expandedTreeSearch(Board& board, State parentTurn);
     double rollout(Board& board);
     BitBoard selectMove(Board& board);
 };

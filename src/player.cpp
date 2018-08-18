@@ -23,9 +23,9 @@ BitBoard Player::search(Board& board)
     std::vector<BitBoard> moveList;
     board.getMoveList(moveList);
     expand(board, moveList);
-    me = board.getTurn();
     for(int i = 0; i < NUM_ROLLOUT; i++){
-        expandedTreeSearch(board, 0);
+        // rootノードには親がいないので、適当にSPACEにしておく
+        expandedTreeSearch(board, State::SPACE);
         board = rootBoard;
     }
 
@@ -37,11 +37,13 @@ BitBoard Player::search(Board& board)
 /* Private methods                  */
 /************************************/
 
-double Player::getScore(const Board& board, int numTotalSelect) const
+double Player::getScore(const Board& board, int numTotalSelect,
+                        State parentTurn) const
 {
     auto node = &expandedTree.at(board);
     double bias = PUCT * sqrt(numTotalSelect) / (node->numSelect + 1);
-    return node->value + bias;
+    return (board.getTurn() != parentTurn ? -node->value : node->value)
+           + bias;
 }
 
 void Player::expand(Board& board, const std::vector<BitBoard>& moveList)
@@ -59,16 +61,16 @@ void Player::expand(Board& board, const std::vector<BitBoard>& moveList)
     }
 }
 
-double Player::expandedTreeSearch(Board& board, int depth)
+double Player::expandedTreeSearch(Board& board, State parentTurn)
 {
     assert(expandedTree.find(board) != std::end(expandedTree));
     double value;
     auto node = &expandedTree[board];
     node->numSelect++;
 
-    //if(8 <= depth){
-    //    std::cout << "depth: " << depth << std::endl;
-    //}
+    // if(8 <= depth){
+    //     std::cout << "depth: " << depth << std::endl;
+    // }
 
     std::vector<BitBoard> moveList;
     if(!board.isEnd()){
@@ -79,6 +81,7 @@ double Player::expandedTreeSearch(Board& board, int depth)
         expand(board, moveList);
     }
 
+    auto myTurn = board.getTurn();
     if(node->isLeaf){
         value = rollout(board);
     }
@@ -90,7 +93,7 @@ double Player::expandedTreeSearch(Board& board, int depth)
         for(const auto& pos : moveList){
             auto revPattern = board.putStone(pos);
             assert(revPattern != 0);
-            auto score = getScore(board, parentNumSelect);
+            auto score = getScore(board, parentNumSelect, myTurn);
             // std::cout << "score: " << score << std::endl;
             if(maxScore < score){
                 maxScore = score;
@@ -100,16 +103,27 @@ double Player::expandedTreeSearch(Board& board, int depth)
         }
         auto revPattern = board.putStone(selectedPos);
         assert(revPattern != 0);
-        value = expandedTreeSearch(board, depth + 1);
+        value = expandedTreeSearch(board, myTurn);
+        //auto xy = Board::posToXY(selectedPos);
+        //std::cout << "selectedPos: (" << xy.first+1 << ", " 
+        //          << xy.second+1 << ")" << std::endl;
     }
 
+    //std::cout << "(value, myTurn, parentTurn) = ("
+    //          << value << ", " << (int)myTurn << ", " << (int)parentTurn << ")"
+    //          << std::endl;
+    //std::cout << "before node value: " << node->value << std::endl;
     node->value = (node->value * (node->numSelect - 1) + value) / node->numSelect;
-    return value;
+    //std::cout << "after node value: " << node->value << std::endl;
+    return (myTurn != parentTurn ? -value : value);
 }
 
 double Player::rollout(Board& board)
 {
     std::vector<BitBoard> moveList;
+    auto orgTurn = board.getTurn();
+    //std::cout << std::endl;
+    //std::cout << "playout of " << (int)orgTurn << std::endl;
     while(!board.isEnd()){
         board.getMoveList(moveList);
         auto pos = moveList.at(dist(engine) % moveList.size());
@@ -120,7 +134,7 @@ double Player::rollout(Board& board)
     if(winner == State::SPACE){
         return 0;
     }
-    else if(winner == me){
+    else if(winner == orgTurn){
         return 1;
     }
     else{
@@ -134,6 +148,7 @@ BitBoard Player::selectMove(Board& board)
     int maxNumSelect = -1;
     std::vector<BitBoard> moveList;
     board.getMoveList(moveList);
+    auto myTurn = board.getTurn();
 
     for(const auto& pos : moveList){
         auto revPattern = board.putStone(pos);
@@ -146,8 +161,12 @@ BitBoard Player::selectMove(Board& board)
         }
         auto xy = Board::posToXY(pos);
         std::cout << "pos: (" << xy.first + 1 << ", " << xy.second + 1
-                  << "), value: " << numSelect
-                  << ", " << expandedTree[board].value << std::endl;
+                  << "), value: " << numSelect << ", "
+                  << (myTurn != board.getTurn() ?
+                      -expandedTree[board].value :
+                       expandedTree[board].value)
+                  << (myTurn != board.getTurn() ? "" : "(pass)")
+                  << std::endl;
         board.undo(pos, revPattern);
     }
     auto xy = Board::posToXY(selectedPos);

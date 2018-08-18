@@ -116,7 +116,7 @@ void selfPlay(Board &board, std::list<History> &hist, const std::list<std::strin
       ofs << static_cast<int>(board.getWinner()) << std::endl;
       for(auto h : hist){
         auto xy = Board::posToXY(h.getPos());
-        ofs << xy.first << ", " << xy.second << std::endl;
+        ofs << xy.first << " " << xy.second << std::endl;
       }
     }
     ofs.close();
