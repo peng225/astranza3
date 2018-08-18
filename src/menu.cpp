@@ -1,5 +1,6 @@
 #include "menu.h"
 #include "player.h"
+#include <fstream>
 #include <assert.h>
 
 void printWinner(const Board &board)
@@ -101,6 +102,7 @@ void selfPlay(Board &board, std::list<History> &hist, const std::list<std::strin
 
   Player pl;
   for(int i = 0; i < numSelfPlay; i++){
+    std::ofstream ofs("kifu/self/kifu" + std::to_string(i));
     while(!board.isEnd()){
       auto pos = pl.search(board);
       // history
@@ -111,7 +113,13 @@ void selfPlay(Board &board, std::list<History> &hist, const std::list<std::strin
     // 終了処理
     if(board.isEnd()){
       printWinner(board);
+      ofs << static_cast<int>(board.getWinner()) << std::endl;
+      for(auto h : hist){
+        auto xy = Board::posToXY(h.getPos());
+        ofs << xy.first << ", " << xy.second << std::endl;
+      }
     }
+    ofs.close();
     board.init();
     hist.clear();
   }

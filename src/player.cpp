@@ -146,7 +146,8 @@ BitBoard Player::selectMove(Board& board)
         }
         auto xy = Board::posToXY(pos);
         std::cout << "pos: (" << xy.first + 1 << ", " << xy.second + 1
-                  << "), value: " << numSelect << std::endl;
+                  << "), value: " << numSelect
+                  << ", " << expandedTree[board].value << std::endl;
         board.undo(pos, revPattern);
     }
     auto xy = Board::posToXY(selectedPos);
