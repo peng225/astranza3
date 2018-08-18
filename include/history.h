@@ -21,3 +21,4 @@ class History
   Board board;
   BitBoard pos;
 };
+

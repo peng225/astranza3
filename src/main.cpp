@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
       }
     }    
     else if(command == "search" || command == "s"){
-      // search(board, ai, depth, hist);
+      search(board, hist);
     }
     else if(command == "setTime" || command == "st"){
       int time;

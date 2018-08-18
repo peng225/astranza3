@@ -16,10 +16,11 @@ class Jouseki
  public:
   void readJousekiFile(std::string filename = DEFAULT_JOUSEKI_FILENAME);
   BitBoard useJouseki(Board &board);
-  void randJousekiList();
+ private:
   /** This function randomize the list of opening database.
    */  
- private:
   std::vector<std::list<BitBoard> > jousekiList;  
+
+  void randJousekiList();
 };
 

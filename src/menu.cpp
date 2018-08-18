@@ -1,4 +1,5 @@
 #include "menu.h"
+#include "player.h"
 #include <assert.h>
 
 void printWinner(const Board &board)
@@ -57,15 +58,8 @@ void put(Board &board, std::list<History> &hist, const std::list<std::string> &a
       printWinner(board);
       return;
     }
-
-    // パスの処理
-    if(board.isPass()){
-      std::cout << (board.getTurn() == State::BLACK ? "BLACK" : "WHITE") << " PASS" << std::endl;
-      board.changeTurn();
-    }    
   }
 
-  
   // board.undo(x, y, revPattern);
   // board.display();  
 }
@@ -78,6 +72,21 @@ void undo(Board &board, std::list<History> &hist)
     board.display();
   }else{
     std::cout << "No history exists." << std::endl;
+  }
+}
+
+void search(Board &board, std::list<History> &hist)
+{
+  Player pl;
+  auto pos = pl.search(board);
+  // history
+  hist.push_back(History(board, pos));
+
+  board.display();
+
+  // 終了処理
+  if(board.isEnd()){
+    printWinner(board);
   }
 }
 

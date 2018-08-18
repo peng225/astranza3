@@ -80,7 +80,13 @@ class Board
   /** Check if the player whose turn is "turn" must pass or not. */
   bool isPass() const;
 
+  std::vector<BitBoard> getMoveList() const;
+
   bool operator==(const Board &obj) const;
+  std::size_t getHash() const
+  {
+    return black ^ white;
+  }
   static std::pair<int, int> posToXY(BitBoard);
   static BitBoard xyToPos(int x, int y);
   static bool isValidPos(BitBoard pos);
@@ -101,4 +107,16 @@ class Board
 
   static BitBoard transfer(BitBoard oneBit, Direction d);
 };
+
+namespace std
+{
+    template <>
+    struct hash<Board>
+    {
+        std::size_t operator () (const Board& key) const
+        {
+            return key.getHash();
+        }
+    };
+}
 

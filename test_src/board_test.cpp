@@ -41,3 +41,19 @@ TEST(board, basic)
     EXPECT_EQ(State::WHITE, board.getTurn());
 }
 
+TEST(board, undo)
+{
+    Board board;
+    board.init();
+    auto rp = board.putStone(Board::xyToPos(5, 4));
+    EXPECT_NE(0ULL, rp);
+
+    auto orgBoard = board;
+    rp = board.putStone(Board::xyToPos(3, 5));
+    EXPECT_NE(0ULL, rp);
+
+    board.undo(Board::xyToPos(3, 5), rp);
+
+    EXPECT_EQ(orgBoard, board);
+}
+

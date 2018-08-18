@@ -3,7 +3,10 @@
 #include <fstream>
 #include <sstream>
 
-//public member of class Jouseki
+/************************************/
+/* Public methods                   */
+/************************************/
+
 void Jouseki::readJousekiFile(std::string filename)
 {
   std::ifstream ifs(filename.c_str());
@@ -15,9 +18,9 @@ void Jouseki::readJousekiFile(std::string filename)
     }
     if(line.empty()){
       for(int i = 0; i < NUM_SYMMETRY; i++){
-	if(!moveList[i].empty()){
-	  jousekiList.push_back(moveList[i]);
-	}
+        if(!moveList[i].empty()){
+          jousekiList.push_back(moveList[i]);
+        }
       }
       for(int i = 0; i < NUM_SYMMETRY; i++){
         moveList[i].clear();
@@ -93,7 +96,10 @@ BitBoard Jouseki::useJouseki(Board &board)
 {
   for(std::vector<std::list<BitBoard> >::iterator i = std::begin(jousekiList);
       i != std::end(jousekiList); i++){
-    if((int)i->size() < board.getTesuu()) continue;
+    if((int)i->size() < board.getTesuu())
+    {
+      continue;
+    }
     int count = 0;
     Board tmpBoard;
     // 現在の手数の手前まで移動
@@ -107,7 +113,7 @@ BitBoard Jouseki::useJouseki(Board &board)
       std::cout << "jouseki x, y = ";
       std::list<BitBoard>::iterator itr = std::begin(*i);
       for(int j = 0; j < count; j++){
-	itr++;
+        itr++;
       }
       board.putStone(*itr, true);
       std::pair<int, int> coord = Board::posToXY(*itr);
@@ -118,8 +124,14 @@ BitBoard Jouseki::useJouseki(Board &board)
   return 0;
 }
 
+
+/************************************/
+/* Private methods                  */
+/************************************/
+
 void Jouseki::randJousekiList()
 {
   Random rnd;
   random_shuffle(jousekiList.begin(), jousekiList.end(), rnd);
 }
+

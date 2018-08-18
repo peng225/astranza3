@@ -144,6 +144,18 @@ State Board::getWinner() const
 }
 
 
+std::vector<BitBoard> Board::getMoveList() const
+{
+    std::vector<BitBoard> moveList;
+    for(const auto& cand : candList){
+        if(canPut(cand)){
+            moveList.push_back(cand);
+        }
+    }
+    assert(!moveList.empty());
+    return moveList;
+}
+
 bool Board::operator==(const Board &obj) const
 {
   if(black == obj.black && white == obj.white){
@@ -297,21 +309,28 @@ BitBoard Board::putStone(BitBoard pos, bool clearClds)
 
   forwardUpdateCandList(pos);
   changeTurn();  
+  if(isPass()){
+    // std::cout << (getTurn() == State::BLACK ? "BLACK" : "WHITE") << " PASS" << std::endl;
+    changeTurn();  
+  }
   tesuu++;
 
   if(clearClds){
     candListDiffs.pop();
     assert(candListDiffs.empty());
   }
-  
+
   return revPattern;
 }
 
 void Board::undo(BitBoard pos, BitBoard revPattern)
 {
-  const BitBoard OPPONENT = (turn == State::BLACK ? white : black);
+  assert(0 < tesuu);
 
-  if(OPPONENT == black){
+  const State WHO_PUT = (getState(pos) == State::BLACK 
+                            ? State::BLACK : State::WHITE);
+
+  if(WHO_PUT == State::BLACK){
     black ^= pos | revPattern;
     white ^= revPattern;
   }else{
@@ -320,7 +339,10 @@ void Board::undo(BitBoard pos, BitBoard revPattern)
   }
   
   backUpdateCandList(pos);
-  changeTurn();
+  // パスが発生していた場合は手番の入れ替えは不要
+  if(turn != WHO_PUT){
+    changeTurn();
+  }
   tesuu--;
 }
 
