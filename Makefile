@@ -1,8 +1,8 @@
 # Makefile
 
 
-CFLAGS = -c -g -O0 -Wall -std=c++14 -flto -MMD -MP
-FINAL_CFLAGS = -g -O0 -Wall -std=c++14 -flto -lreadline
+CFLAGS = -c -g -O3 -Wall -std=c++14 -flto -MMD -MP
+FINAL_CFLAGS = -g -O3 -Wall -std=c++14 -flto -lreadline
 LDLIBS =
 
 TARGET = astranza3

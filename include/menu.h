@@ -10,3 +10,4 @@
 extern void put(Board &board, std::list<History> &hist, const std::list<std::string> &args);
 extern void undo(Board &board, std::list<History> &hist);
 extern void search(Board &board, std::list<History> &hist);
+extern void selfPlay(Board &board, std::list<History> &hist, const std::list<std::string> &args);

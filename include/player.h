@@ -8,8 +8,8 @@
 
 const int NUM_ROLLOUT = 3000;
 const double MIN_SCORE = -NUM_ROLLOUT * 100;
-const double PCUT = 0.5;
-const int EXPAND_THRESH = static_cast<int>(sqrt(NUM_ROLLOUT));
+const double PUCT = 0.5;
+const int EXPAND_THRESH = static_cast<int>(0.4 * log(NUM_ROLLOUT));
 
 struct ExpandedNode
 {
@@ -38,8 +38,8 @@ private:
     Jouseki jsk;
 
     double getScore(const Board& board, int numTotalSelect) const;
-    void expand(Board& board);
-    double expandedTreeSearch(Board& board);
+    void expand(Board& board, const std::vector<BitBoard>& moveList);
+    double expandedTreeSearch(Board& board, int depth);
     double rollout(Board& board);
     BitBoard selectMove(Board& board);
 };

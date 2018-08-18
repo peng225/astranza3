@@ -80,7 +80,7 @@ class Board
   /** Check if the player whose turn is "turn" must pass or not. */
   bool isPass() const;
 
-  std::vector<BitBoard> getMoveList() const;
+  void getMoveList(std::vector<BitBoard>& moveList) const;
 
   bool operator==(const Board &obj) const;
   std::size_t getHash() const

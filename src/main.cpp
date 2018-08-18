@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
     boost::split(cmdAndArgs, line, boost::is_space());    
     command = *begin(cmdAndArgs);
     cmdAndArgs.erase(begin(cmdAndArgs));
-    if(command == "fight" || command == "f"){
-      // fight(board, ai, subAI, cmdAndArgs);
+    if(command == "self" || command == "se"){
+      selfPlay(board, hist, cmdAndArgs);
     }
     else if(command == "undo" || command == "u"){
       undo(board, hist);

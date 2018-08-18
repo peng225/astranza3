@@ -16,6 +16,7 @@ void Board::init()
   tesuu = 1;
 
   candList.clear();
+  std::stack<std::pair<int, int>>().swap(candListDiffs);
 
   // Add first cand pos (2, 2)
   BitBoard pos = xyToPos(2, 2);
@@ -144,23 +145,22 @@ State Board::getWinner() const
 }
 
 
-std::vector<BitBoard> Board::getMoveList() const
+void Board::getMoveList(std::vector<BitBoard>& moveList) const
 {
-    std::vector<BitBoard> moveList;
+    moveList.reserve(candList.size());
     for(const auto& cand : candList){
         if(canPut(cand)){
             moveList.push_back(cand);
         }
     }
     assert(!moveList.empty());
-    return moveList;
 }
 
 bool Board::operator==(const Board &obj) const
 {
-  if(black == obj.black && white == obj.white){
+  if(black == obj.black && white == obj.white
+     && turn == obj.getTurn()){
     assert(tesuu == obj.tesuu);
-    assert(turn == obj.turn);
     return true;
   }else{
     return false;
@@ -425,31 +425,6 @@ void Board::backUpdateCandList(BitBoard pos)
   }
 
   candList.insert(posItr, pos);  
-
-  // bool erased = false;
-  // for(list<BitBoard>::iterator itr = begin(candList);
-  //     itr != end(candList); itr++){    
-  //   erased = true;
-  //   assert(isValidPos(*itr));
-  //   for(int i = 0; i < NUM_DIRECTION; i++){      
-  //     BitBoard aroundPos = transfer(*itr, DIRS[i]);
-  //     // 盤面からはみ出していたらダメ
-  //     if(!isValidPos(aroundPos)){
-  // 	assert(aroundPos == 0);
-  // 	continue;
-  //     }
-  //     if(getState(aroundPos) != SPACE){
-  // 	erased = false;
-  // 	break;
-  //     }
-  //   }
-  //   if(erased){
-  //     itr = candList.erase(itr);
-  //     itr--;
-  //   }
-  // }
-
-  // candList.push_back(pos);
 }
 
 //void Board::displayCandListPos()

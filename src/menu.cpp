@@ -27,7 +27,6 @@ void put(Board &board, std::list<History> &hist, const std::list<std::string> &a
   }
   
   int x = 0, y = 0;
-  bool putSuccess = true;
 
   std::list<std::string>::const_iterator itr = std::begin(args);
   x = atoi(itr->c_str());
@@ -43,11 +42,11 @@ void put(Board &board, std::list<History> &hist, const std::list<std::string> &a
 
   // BitBoard revPattern;  
   // if((revPattern = board.putStone(x, y)) == 0){
-  if(!board.putStone(pos, true)){
+  // if(!board.putStone(pos, true)){
+  if(!board.putStone(pos)){
     std::cout << "Illegal move!" << std::endl;
-    putSuccess = false;
   }
-  if(putSuccess){
+  else{
     // history
     hist.push_back(History(board, pos));
 
@@ -87,6 +86,34 @@ void search(Board &board, std::list<History> &hist)
   // 終了処理
   if(board.isEnd()){
     printWinner(board);
+  }
+}
+
+void selfPlay(Board &board, std::list<History> &hist, const std::list<std::string> &args)
+{
+  if(args.size() < 1){
+    std::cerr << "the number of self play is required." << std::endl;
+    return;
+  }
+  
+  std::list<std::string>::const_iterator itr = std::begin(args);
+  auto numSelfPlay = atoi(itr->c_str());
+
+  Player pl;
+  for(int i = 0; i < numSelfPlay; i++){
+    while(!board.isEnd()){
+      auto pos = pl.search(board);
+      // history
+      hist.push_back(History(board, pos));
+      board.display();
+    }
+
+    // 終了処理
+    if(board.isEnd()){
+      printWinner(board);
+    }
+    board.init();
+    hist.clear();
   }
 }
 
