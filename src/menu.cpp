@@ -3,6 +3,9 @@
 #include <fstream>
 #include <assert.h>
 
+namespace menu
+{
+
 void printWinner(const Board &board)
 {
   State winner = board.getWinner();
@@ -123,5 +126,6 @@ void selfPlay(Board &board, std::list<History> &hist, const std::list<std::strin
     board.init();
     hist.clear();
   }
+}
 }
 

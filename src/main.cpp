@@ -71,10 +71,10 @@ int main(int argc, char *argv[])
     command = *begin(cmdAndArgs);
     cmdAndArgs.erase(begin(cmdAndArgs));
     if(command == "self" || command == "se"){
-      selfPlay(board, hist, cmdAndArgs);
+      menu::selfPlay(board, hist, cmdAndArgs);
     }
     else if(command == "undo" || command == "u"){
-      undo(board, hist);
+      menu::undo(board, hist);
     }
     else if(command == "setDepth" || command == "sd"){
       if(cmdAndArgs.size() < 1){
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
       }
     }    
     else if(command == "search" || command == "s"){
-      search(board, hist);
+      menu::search(board, hist);
     }
     else if(command == "setTime" || command == "st"){
       int time;
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
       // ai.init();
     }
     else if(command == "put" || command == "p"){
-      put(board, hist, cmdAndArgs);
+      menu::put(board, hist, cmdAndArgs);
     }
     else if(command == "display" || command == "d"){
       board.display();
