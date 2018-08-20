@@ -122,23 +122,41 @@ double Player::rollout(Board& board)
 {
     std::vector<BitBoard> moveList;
     auto orgTurn = board.getTurn();
+    int count = 0;
     //std::cout << std::endl;
     //std::cout << "playout of " << (int)orgTurn << std::endl;
-    while(!board.isEnd()){
+    while(!board.isEnd() && count < rolloutDepth){
         board.getMoveList(moveList);
         auto pos = moveList.at(dist(engine) % moveList.size());
         board.putStone(pos);
         moveList.clear();
+        count++;
     }
-    auto winner = board.getWinner();
-    if(winner == State::SPACE){
-        return 0;
+
+    if(board.isEnd()){
+        auto winner = board.getWinner();
+        if(winner == State::SPACE){
+            return 0;
+        }
+        else if(winner == orgTurn){
+            return 1;
+        }
+        else{
+            return -1;
+        }
     }
-    else if(winner == orgTurn){
-        return 1;
-    }
-    else{
-        return -1;
+    else
+    {
+        std::vector<float> input(BOARD_SIZE * BOARD_SIZE);
+        board.toVector(input);
+        assert(dn != nullptr);
+        auto out = dn->feedInput(input);
+        assert(out.back().size() == 2);
+        if(orgTurn == State::BLACK){
+            return out.back().at(0) - out.back().at(1);
+        }else{
+            return -out.back().at(0) + out.back().at(1);
+        }
     }
 }
 

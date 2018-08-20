@@ -81,6 +81,7 @@ class Board
   bool isPass() const;
 
   void getMoveList(std::vector<BitBoard>& moveList) const;
+  void toVector(std::vector<float>& vec) const;
 
   bool operator==(const Board &obj) const;
   std::size_t getHash() const
@@ -90,6 +91,7 @@ class Board
   static std::pair<int, int> posToXY(BitBoard);
   static BitBoard xyToPos(int x, int y);
   static bool isValidPos(BitBoard pos);
+  static BitBoard transfer(BitBoard oneBit, Direction d);
 
  private:
   BitBoard black;
@@ -104,8 +106,6 @@ class Board
   void backUpdateCandList(BitBoard pos);  
   /* BitBoard getDoughnut(BitBoard pos) const; */
   // void displayCandListPos();
-
-  static BitBoard transfer(BitBoard oneBit, Direction d);
 };
 
 namespace std

@@ -2,14 +2,17 @@
 
 #include "board.h"
 #include "jouseki.h"
+#include "cnn.h"
 #include <unordered_map>
 #include <random>
 #include <cmath>
+#include <memory>
 
-const int NUM_ROLLOUT = 10000;
+const int NUM_ROLLOUT = 3000;
 const double MIN_SCORE = -NUM_ROLLOUT * 100;
 const double PUCT = 0.5;
 const int EXPAND_THRESH = static_cast<int>(0.4 * log(NUM_ROLLOUT));
+const int DEFAULT_ROLLOUT_DEPTH = 4;
 
 struct ExpandedNode
 {
@@ -23,10 +26,14 @@ class Player
 {
 friend class PlayerTest;
 public:
-    Player() : engine(seed_gen()), dist(0, 100000000)
+    Player(std::shared_ptr<DeepNetwork> dnet, int rdepth) : engine(seed_gen()), dist(0, 100000000), dn(dnet), rolloutDepth(rdepth)
     {
         jsk.readJousekiFile();
     }
+    //Player() : engine(seed_gen()), dist(0, 100000000)
+    //{
+    //    jsk.readJousekiFile();
+    //}
     BitBoard search(Board& board);
 
 private:
@@ -35,6 +42,8 @@ private:
     std::mt19937 engine;
     std::uniform_int_distribution<> dist;
     Jouseki jsk;
+    std::shared_ptr<DeepNetwork> dn;
+    int rolloutDepth;
 
     double getScore(const Board& board, int numTotalSelect,
                     State parentTurn) const;

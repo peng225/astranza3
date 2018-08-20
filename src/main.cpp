@@ -18,44 +18,7 @@ int main(int argc, char *argv[])
   int depth = DEFAULT_DEPTH;
 
   board.display();
-
-  if(argc >= 2 && argv[1][0] == 'b'){
-    BitBoard pos;
-    pos = Board::xyToPos(3, 2);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(2, 2);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(2, 3);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(4, 2);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(2, 1);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(3, 5);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(4, 1);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(3, 1);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(5, 2);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(5, 3);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(3, 0);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(6, 2);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(5, 4);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(5, 5);
-    board.putStone(pos, true);
-    pos = Board::xyToPos(2, 5);
-    board.putStone(pos, true);
-    
-    board.display();
-
-    return 0;
-  }
+  menu::init();
 
   int history_no = 0;
   HIST_ENTRY *history = NULL;
@@ -63,13 +26,16 @@ int main(int argc, char *argv[])
   const char *prompt = "> ";
   while ((line = readline(prompt)) != NULL) {
     std::string command;
-    // std::istringstream* ist;    
-    // ist = new std::istringstream(line);    
-    // (*ist) >> command;
     std::list<std::string> cmdAndArgs;
-    boost::split(cmdAndArgs, line, boost::is_space());    
-    command = *begin(cmdAndArgs);
-    cmdAndArgs.erase(begin(cmdAndArgs));
+    boost::split(cmdAndArgs, line, boost::is_space());
+    cmdAndArgs.remove("");
+    if(cmdAndArgs.empty()){
+      command = "";
+    }else{
+      command = *begin(cmdAndArgs);
+      cmdAndArgs.erase(begin(cmdAndArgs));
+    }
+
     if(command == "self" || command == "se"){
       menu::selfPlay(board, hist, cmdAndArgs);
     }
@@ -99,8 +65,7 @@ int main(int argc, char *argv[])
       }
     }
     else if(command == "learn" || command == "l"){
-      // learn(cmdAndArgs);
-      // ln.learn("hoge");
+      menu::learn(cmdAndArgs);
     }
     // else if(command == "generate" || command == "g") gen_kifu(*ist);
     else if(command == "init" || command == "i"){

@@ -1,5 +1,6 @@
 #include "learner.h"
 #include "random.h"
+#include "utility.h"
 #include <cmath>
 #include <string>
 #include <fstream>
@@ -7,13 +8,14 @@
 
 
 //棋譜ファイルを読んで局面を変数kyokumenに突っ込んでいき、最後にrandomize
-void Learner::loadKifu()
+void Learner::loadKifu(int numLoadKifu)
 {
+  assert(0 < numLoadKifu);
   std::ifstream ifs;
   std::string line;
   char filename[MAX_FILENAME];
 
-  for(int i = 0; i < LOAD_KIFU_NUM; i++){
+  for(int i = 0; i < numLoadKifu; i++){
     sprintf(filename, "kifu/self/kifu%d", i);
     ifs.open(filename);
     if(!ifs){
@@ -24,8 +26,9 @@ void Learner::loadKifu()
     Board board;
     int count = 0;
     int tx, ty;
-    getline(ifs, line);
     std::cout << "filename: " << filename << std::endl;
+    getline(ifs, line);
+    State winner = static_cast<State>(std::stoi(line));
     while(getline(ifs, line)){
       if(line == "\n"){
         break;
@@ -54,7 +57,7 @@ void Learner::loadKifu()
       }
       // tboard.display();
       // 正解の指し手を保存していく
-      kyokumen.push_back(CorrectMove(board, pos));
+      kyokumen.push_back(CorrectMove(board, pos, winner));
 
       // boardを一手ずつ進めていく
       // パスなら手順を入れ替えてやり直し
@@ -79,5 +82,61 @@ void Learner::loadKifu()
   std::cout << "Training data randomized!" << std::endl;
   std::cout << "Loaded kyokumen num: " << kyokumen.size() << std::endl;
 }
+
+
+void Learner::learn()
+{
+    if(kyokumen.empty()){
+        std::cerr << "No training data found" << std::endl;
+        return;
+    }
+
+    std::vector<float> input(BOARD_SIZE * BOARD_SIZE);
+    std::vector<float> correctOutput(2);
+    for(int i = 0; i < REPEAT_NUM; i++){
+        for(const auto& km : kyokumen)
+        {
+            km.board.toVector(input);
+            if(km.winner == State::BLACK){
+                correctOutput.at(0) = 1;
+                correctOutput.at(1) = 0;
+            }else if(km.winner == State::WHITE){
+                correctOutput.at(0) = 0;
+                correctOutput.at(1) = 1;
+            }else{
+                correctOutput.at(0) = 0.5;
+                correctOutput.at(1) = 0.5;
+            }
+            dn->backPropagate(input, correctOutput);
+        }
+    }
+
+    std::cout << "check" << std::endl;
+    int count = 0;
+    for(const auto& km : kyokumen)
+    {
+        km.board.toVector(input);
+        //km.board.display();
+        //printVector(input);
+        if(km.winner == State::BLACK){
+            correctOutput.at(0) = 1;
+            correctOutput.at(1) = 0;
+        }else if(km.winner == State::WHITE){
+            correctOutput.at(0) = 0;
+            correctOutput.at(1) = 1;
+        }else{
+            correctOutput.at(0) = 0.5;
+            correctOutput.at(1) = 0.5;
+        }
+
+        auto out = dn->feedInput(input);
+        assert(out.back().size() == 2);
+        std::cout << "out, cout: " << out.back().at(0) << ", " << correctOutput.at(0) << std::endl;
+        std::cout << "         : " << out.back().at(1) << ", " << correctOutput.at(1) << std::endl;
+        count++;
+        if(count == 10) break;
+    }
+}
+
 
 

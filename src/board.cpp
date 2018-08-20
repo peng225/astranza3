@@ -156,6 +156,20 @@ void Board::getMoveList(std::vector<BitBoard>& moveList) const
     assert(!moveList.empty());
 }
 
+void Board::toVector(std::vector<float>& vec) const
+{
+    for(int i = 0; i < BOARD_SIZE; i++){
+        BitBoard pos = MSB_ONLY_64;
+        pos = pos >> (BOARD_SIZE * i);
+        for(int j = 0; j < BOARD_SIZE; j++){
+            vec.at(i * BOARD_SIZE + j) =
+                            static_cast<int>(getState(pos));
+            pos = Board::transfer(pos, Direction::RIGHT);
+        }
+    }
+}
+
+
 bool Board::operator==(const Board &obj) const
 {
   if(black == obj.black && white == obj.white
@@ -188,12 +202,6 @@ bool Board::isValidPos(BitBoard pos)
   return (pos != 0) && ((pos & (pos - 1)) == 0);
 }
 
-
-
-/************************************/
-/* Private methods                  */
-/************************************/
-
 BitBoard Board::transfer(BitBoard oneBit, Direction d)
 {
   switch(d){
@@ -217,6 +225,12 @@ BitBoard Board::transfer(BitBoard oneBit, Direction d)
     return 0xFFFFFFFFFFFFFFFF;
   }
 }
+
+
+
+/************************************/
+/* Private methods                  */
+/************************************/
 
 // 要ユニットテスト
 // BitBoard Board::getDoughnut(BitBoard pos) const
