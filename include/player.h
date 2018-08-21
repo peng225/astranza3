@@ -8,7 +8,7 @@
 #include <cmath>
 #include <memory>
 
-const int NUM_ROLLOUT = 3000;
+const int NUM_ROLLOUT = 1600;
 const double MIN_SCORE = -NUM_ROLLOUT * 100;
 const double PUCT = 0.5;
 const int EXPAND_THRESH = static_cast<int>(0.4 * log(NUM_ROLLOUT));

@@ -16,20 +16,35 @@ void init()
         // Construct network
         dn[i]->setInputInfo(DataSize(BOARD_SIZE, BOARD_SIZE), 1);
 
-        auto l1 = std::make_shared<ConvolutionLayer>(1, 3, 2);
+        auto l1 = std::make_shared<ConvolutionLayer>(1, 4, 8);
         dn[i]->addLayer(l1);
 
         auto l2 = std::make_shared<ReLULayer>();
         dn[i]->addLayer(l2);
 
-        auto l3 = std::make_shared<PoolingLayer>(1, 3);
+        auto l3 = std::make_shared<PoolingLayer>(1, 4);
         dn[i]->addLayer(l3);
 
-        auto l4 = std::make_shared<FullConnectLayer>(DataSize(2, 1));
+        auto l4 = std::make_shared<ConvolutionLayer>(1, 3, 16);
         dn[i]->addLayer(l4);
 
-        auto l5 = std::make_shared<ActivateLayer>();
+        auto l5 = std::make_shared<ReLULayer>();
         dn[i]->addLayer(l5);
+
+        auto l6 = std::make_shared<PoolingLayer>(1, 3);
+        dn[i]->addLayer(l6);
+
+        auto l7 = std::make_shared<FullConnectLayer>(DataSize(40, 1));
+        dn[i]->addLayer(l7);
+
+        auto l8 = std::make_shared<SigmoidLayer>();
+        dn[i]->addLayer(l8);
+
+        auto l9 = std::make_shared<FullConnectLayer>(DataSize(2, 1));
+        dn[i]->addLayer(l9);
+
+        auto l10 = std::make_shared<SoftmaxLayer>();
+        dn[i]->addLayer(l10);
     }
 }
 
@@ -205,6 +220,37 @@ void learn(const std::list<std::string> &args)
     Learner ln(dn[dnObjId]);
     ln.loadKifu(numLoadKifu);
     ln.learn();
+}
+
+
+void saveWeight(const std::list<std::string> &args)
+{
+  if(args.size() < 2){
+    std::cerr << "usage: save [dnID 0 or 1] [filename]" << std::endl;
+    return;
+  }
+
+  std::list<std::string>::const_iterator itr = std::begin(args);
+  auto dnId = atoi(itr->c_str());
+  itr++;
+  auto filename = itr->c_str();
+
+  dn[dnId]->saveWeight(filename);
+}
+
+void loadWeight(const std::list<std::string> &args)
+{
+  if(args.size() < 2){
+    std::cerr << "usage: load [dnID 0 or 1] [filename]" << std::endl;
+    return;
+  }
+
+  std::list<std::string>::const_iterator itr = std::begin(args);
+  auto dnId = atoi(itr->c_str());
+  itr++;
+  auto filename = itr->c_str();
+
+  dn[dnId]->loadWeight(filename);
 }
 
 }

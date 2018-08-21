@@ -80,15 +80,15 @@ int main(int argc, char *argv[])
     else if(command == "display" || command == "d"){
       board.display();
     }
+    else if(command == "save" || command == "sv"){
+      menu::saveWeight(cmdAndArgs);
+    }
     else if(command == "load" || command == "ld"){
-      // load(ai, subAI, cmdAndArgs);
+      menu::loadWeight(cmdAndArgs);
     }
-    // else if(command == "help" || command == "h") help();
-    else if(command == "kifu" || command == "k"){
-      // outputKifu(hist);
+    else if(command == "quit" || command == "q"){
+      break;    
     }
-    else if(command == "quit" || command == "q") break;    
-    // else if(command == "estimate" || command == "es") estimate(*ist);
     else if(command == ""){
     }
     else{
