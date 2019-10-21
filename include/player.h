@@ -8,11 +8,11 @@
 #include <cmath>
 #include <memory>
 
-const int NUM_ROLLOUT = 1600;
-const double MIN_SCORE = -NUM_ROLLOUT * 100;
-const double PUCT = 0.5;
+constexpr int NUM_ROLLOUT = 1600;
+constexpr double MIN_SCORE = -NUM_ROLLOUT * 100;
+constexpr double PUCT = 0.5;
 const int EXPAND_THRESH = static_cast<int>(0.4 * log(NUM_ROLLOUT));
-const int DEFAULT_ROLLOUT_DEPTH = 4;
+constexpr int DEFAULT_ROLLOUT_DEPTH = 4;
 
 struct ExpandedNode
 {
@@ -34,7 +34,7 @@ public:
     //{
     //    jsk.readJousekiFile();
     //}
-    BitBoard search(Board& board);
+    BitBoard search(Board& board, bool verbose = true);
 
 private:
     std::unordered_map<Board, ExpandedNode> expandedTree;
@@ -50,6 +50,6 @@ private:
     void expand(Board& board, const std::vector<BitBoard>& moveList);
     double expandedTreeSearch(Board& board, State parentTurn);
     double rollout(Board& board);
-    BitBoard selectMove(Board& board);
+    BitBoard selectMove(Board& board, bool verbose);
 };
 

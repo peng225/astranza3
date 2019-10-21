@@ -8,10 +8,10 @@
 /* Public methods                   */
 /************************************/
 
-BitBoard Player::search(Board& board)
+BitBoard Player::search(Board& board, bool verbose)
 {
     assert(!board.isEnd());
-    auto jousekiPos = jsk.useJouseki(board);
+    auto jousekiPos = jsk.useJouseki(board, verbose);
     if(jousekiPos != 0){
         return jousekiPos;
     }
@@ -29,7 +29,7 @@ BitBoard Player::search(Board& board)
         board = rootBoard;
     }
 
-    return selectMove(board);
+    return selectMove(board, verbose);
 }
 
 
@@ -160,7 +160,7 @@ double Player::rollout(Board& board)
     }
 }
 
-BitBoard Player::selectMove(Board& board)
+BitBoard Player::selectMove(Board& board, bool verbose)
 {
     BitBoard selectedPos;
     int maxNumSelect = -1;
@@ -178,18 +178,22 @@ BitBoard Player::selectMove(Board& board)
             selectedPos = pos;
         }
         auto xy = Board::posToXY(pos);
-        std::cout << "pos: (" << xy.first + 1 << ", " << xy.second + 1
-                  << "), value: " << numSelect << ", "
-                  << (myTurn != board.getTurn() ?
-                      -expandedTree[board].value :
-                       expandedTree[board].value)
-                  << (myTurn != board.getTurn() ? "" : "(pass)")
-                  << std::endl;
+        if(verbose) {
+          std::cout << "pos: (" << xy.first + 1 << ", " << xy.second + 1
+                    << "), value: " << numSelect << ", "
+                    << (myTurn != board.getTurn() ?
+                        -expandedTree[board].value :
+                         expandedTree[board].value)
+                    << (myTurn != board.getTurn() ? "" : "(pass)")
+                    << std::endl;
+        }
         board.undo(pos, revPattern);
     }
     auto xy = Board::posToXY(selectedPos);
-    std::cout << "pos: (" << xy.first + 1 << ", " << xy.second + 1
-              << ") was selected" << std::endl;
+    if(verbose){
+      std::cout << "pos: (" << xy.first + 1 << ", " << xy.second + 1
+                << ") was selected" << std::endl;
+    }
     board.putStone(selectedPos);
     return selectedPos;
 }

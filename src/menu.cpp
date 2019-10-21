@@ -3,10 +3,11 @@
 #include "learner.h"
 #include <fstream>
 #include <cassert>
+#include <unistd.h>
 
 namespace menu
 {
-const int NUM_DN_OBJ = 2;
+constexpr int NUM_DN_OBJ = 2;
 std::shared_ptr<DeepNetwork> dn[NUM_DN_OBJ];
 
 void init()
@@ -120,19 +121,84 @@ void undo(Board &board, std::list<History> &hist)
   }
 }
 
-void search(Board &board, std::list<History> &hist)
+void search(Board &board, std::list<History> &hist, bool verbose)
 {
   Player pl(dn[0], DEFAULT_ROLLOUT_DEPTH);
   auto pos = pl.search(board);
   // history
   hist.push_back(History(board, pos));
 
-  board.display();
+  if(verbose){
+    board.display();
+  }
 
   // 終了処理
   if(board.isEnd()){
     printWinner(board);
   }
+}
+
+
+float selfPlay(Board &board, std::list<History> &hist,
+              int numSelfPlay,
+              int rolloutDepth,
+              bool shouldSaveKifu,
+              int dnId1,
+              int dnId2,
+              bool verbose)
+{
+  Player pl1(dn[dnId1], rolloutDepth);
+  Player pl2(dn[dnId2], rolloutDepth);
+  int numPl1Win = 0;
+  int numDraw = 0;
+  for(int i = 0; i < numSelfPlay; i++){
+    BitBoard pos;
+    while(!board.isEnd()){
+      if(board.getTurn() == State::BLACK){
+        pos = pl1.search(board, verbose);
+      }else{
+        pos = pl2.search(board, verbose);
+      }
+      // history
+      hist.emplace_back(History(board, pos));
+      if(verbose){
+        board.display();
+      }
+    }
+
+    // 終了処理
+    printWinner(board);
+    auto winner = board.getWinner();
+    if(winner == State::BLACK){
+      numPl1Win++;
+    }else if(winner == State::SPACE){
+      numDraw++;
+    }
+    if(shouldSaveKifu){
+      std::ofstream ofs("kifu/evolve/kifu" + std::to_string(i));
+      ofs << static_cast<int>(board.getWinner()) << std::endl;
+      for(auto h : hist){
+        auto xy = Board::posToXY(h.getPos());
+        ofs << xy.first << " " << xy.second << std::endl;
+      }
+      ofs.close();
+    }
+    board.init();
+    hist.clear();
+  }
+
+  // Print the result
+  float p1WinRate;
+  if(numSelfPlay == numDraw){
+    p1WinRate = 0.5;
+    std::cout << "All games were draw" << std::endl;
+  }else{
+    p1WinRate = static_cast<double>(numPl1Win) / (numSelfPlay - numDraw);
+    std::cout << "Player 1's win rate: "
+              << 100 * p1WinRate << "%" << std::endl;
+  }
+
+  return p1WinRate;
 }
 
 void selfPlay(Board &board, std::list<History> &hist, const std::list<std::string> &args)
@@ -153,52 +219,8 @@ void selfPlay(Board &board, std::list<History> &hist, const std::list<std::strin
   itr++;
   auto dnId2 = atoi(itr->c_str());
 
-  Player pl1(dn[dnId1], rolloutDepth);
-  Player pl2(dn[dnId2], rolloutDepth);
-  int numPl1Win = 0;
-  int numDraw = 0;
-  for(int i = 0; i < numSelfPlay; i++){
-    BitBoard pos;
-    while(!board.isEnd()){
-      if(board.getTurn() == State::BLACK){
-        pos = pl1.search(board);
-      }else{
-        pos = pl2.search(board);
-      }
-      // history
-      hist.push_back(History(board, pos));
-      board.display();
-    }
-
-    // 終了処理
-    printWinner(board);
-    auto winner = board.getWinner();
-    if(winner == State::BLACK){
-      numPl1Win++;
-    }else if(winner == State::SPACE){
-      numDraw++;
-    }
-    if(shouldSaveKifu){
-      std::ofstream ofs("kifu/self/kifu" + std::to_string(i));
-      ofs << static_cast<int>(board.getWinner()) << std::endl;
-      for(auto h : hist){
-        auto xy = Board::posToXY(h.getPos());
-        ofs << xy.first << " " << xy.second << std::endl;
-      }
-      ofs.close();
-    }
-    board.init();
-    hist.clear();
-  }
-
-  // Print the result
-  if(numSelfPlay == numDraw){
-    std::cout << "All games were draw" << std::endl;
-  }else{
-    std::cout << "Player 1's win rate: "
-              << 100* static_cast<double>(numPl1Win) / (numSelfPlay - numDraw)
-              << "%" << std::endl;
-  }
+  selfPlay(board, hist, numSelfPlay, rolloutDepth,
+           shouldSaveKifu, dnId1, dnId2, true);
 }
 
 
@@ -251,6 +273,59 @@ void loadWeight(const std::list<std::string> &args)
   auto filename = itr->c_str();
 
   dn[dnId]->loadWeight(filename);
+}
+
+void evolve(const std::list<std::string> &args)
+{
+  if(args.size() < 3){
+    std::cerr << "usage: evolve [rollout depth] [dnID 0 or 1] [filename]" << std::endl;
+    return;
+  }
+
+  Board board;
+  std::list<History> hist;
+  std::list<std::string>::const_iterator itr = std::begin(args);
+  auto rolloutDepth = atoi(itr->c_str());
+  itr++;
+  auto dnId = atoi(itr->c_str());
+  itr++;
+  auto filename = itr->c_str();
+
+  int othDnId = (dnId + 1) % 2;
+
+  int numPlay = 50;
+  int numTestPlay = 10;
+
+  float p1WinRate = 0.0;
+  int numIteration = 0;
+  while(p1WinRate < 0.65 && numIteration < 3) {
+    std::cout << "Iteration#: " << numIteration << std::endl;
+    board.init();
+    hist.clear();
+
+    // Produce phase
+    std::cout << "Produce phase start!" << std::endl;
+    sleep(1);
+    selfPlay(board, hist, numPlay, rolloutDepth, true,
+             dnId, othDnId, false);
+
+    // Learning phase
+    std::cout << "Learning phase start!" << std::endl;
+    sleep(1);
+    Learner ln(dn[dnId]);
+    ln.loadKifu(numPlay);
+    ln.learn();
+
+    // Test phase
+    board.init();
+    hist.clear();
+    std::cout << "Test phase start!" << std::endl;
+    sleep(1);
+    p1WinRate = selfPlay(board, hist, numTestPlay, DEFAULT_ROLLOUT_DEPTH, false, dnId, othDnId, false);
+    numIteration++;
+  }
+
+  dn[dnId]->saveWeight(filename);
 }
 
 }

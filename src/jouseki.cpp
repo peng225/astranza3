@@ -92,7 +92,7 @@ void Jouseki::readJousekiFile(std::string filename)
   randJousekiList();
 }
 
-BitBoard Jouseki::useJouseki(Board &board)
+BitBoard Jouseki::useJouseki(Board &board, bool verbose)
 {
   for(std::vector<std::list<BitBoard> >::iterator i = std::begin(jousekiList);
       i != std::end(jousekiList); i++){
@@ -111,7 +111,9 @@ BitBoard Jouseki::useJouseki(Board &board)
     }
     // 定石ファイルに同じ盤面が存在すれば使う
     if(board == tmpBoard){
-      std::cout << "jouseki x, y = ";
+      if(verbose){
+        std::cout << "jouseki x, y = ";
+      }
       std::list<BitBoard>::iterator itr = std::begin(*i);
       for(int j = 0; j < count; j++){
         itr++;
@@ -119,7 +121,9 @@ BitBoard Jouseki::useJouseki(Board &board)
       // board.putStone(*itr, true);
       board.putStone(*itr);
       std::pair<int, int> coord = Board::posToXY(*itr);
-      std::cout << coord.first + 1 << ", " << coord.second + 1 << std::endl;
+      if(verbose){
+        std::cout << coord.first + 1 << ", " << coord.second + 1 << std::endl;
+      }
       return *itr;
     }
   }
