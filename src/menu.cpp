@@ -121,16 +121,14 @@ void undo(Board &board, std::list<History> &hist)
   }
 }
 
-void search(Board &board, std::list<History> &hist, bool verbose)
+void search(Board &board, std::list<History> &hist)
 {
   Player pl(dn[0], DEFAULT_ROLLOUT_DEPTH);
   auto pos = pl.search(board);
   // history
   hist.push_back(History(board, pos));
 
-  if(verbose){
-    board.display();
-  }
+  board.display();
 
   // 終了処理
   if(board.isEnd()){
