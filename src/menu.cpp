@@ -275,8 +275,8 @@ void loadWeight(const std::list<std::string> &args)
 
 void evolve(const std::list<std::string> &args)
 {
-  if(args.size() < 3){
-    std::cerr << "usage: evolve [rollout depth] [dnID 0 or 1] [filename]" << std::endl;
+  if(args.size() < 5){
+    std::cerr << "usage: evolve [rollout depth] [num max itr] [num one round] [dnID 0 or 1] [filename]" << std::endl;
     return;
   }
 
@@ -285,18 +285,27 @@ void evolve(const std::list<std::string> &args)
   std::list<std::string>::const_iterator itr = std::begin(args);
   auto rolloutDepth = atoi(itr->c_str());
   itr++;
+  auto numMaxItr = atoi(itr->c_str());
+  itr++;
+  auto numOneRound = atoi(itr->c_str());
+  itr++;
   auto dnId = atoi(itr->c_str());
   itr++;
   auto filename = itr->c_str();
 
+  std::cout << "rolloutDepth: " << rolloutDepth << std::endl
+            << "numMaxItr: " << numMaxItr << std::endl
+            << "numOneRound: " << numOneRound << std::endl
+            << "dnId: " << dnId << std::endl
+            << "filename: " << filename << std::endl;
+
   int othDnId = (dnId + 1) % 2;
 
-  int numPlay = 50;
   int numTestPlay = 10;
 
   float p1WinRate = 0.0;
   int numIteration = 0;
-  while(p1WinRate < 0.65 && numIteration < 3) {
+  while(p1WinRate < 0.65 && numIteration < numMaxItr) {
     std::cout << "Iteration#: " << numIteration << std::endl;
     board.init();
     hist.clear();
@@ -304,14 +313,14 @@ void evolve(const std::list<std::string> &args)
     // Produce phase
     std::cout << "Produce phase start!" << std::endl;
     sleep(1);
-    selfPlay(board, hist, numPlay, rolloutDepth, true,
-             dnId, othDnId, false);
+    selfPlay(board, hist, numOneRound, rolloutDepth, true,
+             dnId, dnId, false);
 
     // Learning phase
     std::cout << "Learning phase start!" << std::endl;
     sleep(1);
     Learner ln(dn[dnId]);
-    ln.loadKifu(numPlay);
+    ln.loadKifu(numOneRound);
     ln.learn();
 
     // Test phase
@@ -321,9 +330,10 @@ void evolve(const std::list<std::string> &args)
     sleep(1);
     p1WinRate = selfPlay(board, hist, numTestPlay, DEFAULT_ROLLOUT_DEPTH, false, dnId, othDnId, false);
     numIteration++;
-  }
 
-  dn[dnId]->saveWeight(filename);
+    // save
+    dn[dnId]->saveWeight(filename);
+  }
 }
 
 }
