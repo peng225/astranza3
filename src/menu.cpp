@@ -140,6 +140,7 @@ void search(Board &board, std::list<History> &hist)
 float selfPlay(Board &board, std::list<History> &hist,
               int numSelfPlay,
               int rolloutDepth,
+              int numRollout,
               bool shouldSaveKifu,
               int dnId1,
               int dnId2,
@@ -153,9 +154,9 @@ float selfPlay(Board &board, std::list<History> &hist,
     BitBoard pos;
     while(!board.isEnd()){
       if(board.getTurn() == State::BLACK){
-        pos = pl1.search(board, verbose);
+        pos = pl1.search(board, numRollout, verbose);
       }else{
-        pos = pl2.search(board, verbose);
+        pos = pl2.search(board, numRollout, verbose);
       }
       // history
       hist.emplace_back(History(board, pos));
@@ -217,7 +218,7 @@ void selfPlay(Board &board, std::list<History> &hist, const std::list<std::strin
   itr++;
   auto dnId2 = atoi(itr->c_str());
 
-  selfPlay(board, hist, numSelfPlay, rolloutDepth,
+  selfPlay(board, hist, numSelfPlay, rolloutDepth, NUM_DEFAULT_ROLLOUT,
            shouldSaveKifu, dnId1, dnId2, true);
 }
 
@@ -275,8 +276,8 @@ void loadWeight(const std::list<std::string> &args)
 
 void evolve(const std::list<std::string> &args)
 {
-  if(args.size() < 5){
-    std::cerr << "usage: evolve [rollout depth] [num max itr] [num one round] [dnID 0 or 1] [filename]" << std::endl;
+  if(args.size() < 6){
+    std::cerr << "usage: evolve [rollout depth] [num rollout] [num max itr] [num one round] [dnID 0 or 1] [filename]" << std::endl;
     return;
   }
 
@@ -284,6 +285,8 @@ void evolve(const std::list<std::string> &args)
   std::list<History> hist;
   std::list<std::string>::const_iterator itr = std::begin(args);
   auto rolloutDepth = atoi(itr->c_str());
+  itr++;
+  auto numRollout = atoi(itr->c_str());
   itr++;
   auto numMaxItr = atoi(itr->c_str());
   itr++;
@@ -294,6 +297,7 @@ void evolve(const std::list<std::string> &args)
   auto filename = itr->c_str();
 
   std::cout << "rolloutDepth: " << rolloutDepth << std::endl
+            << "numRollout: " << numRollout << std::endl
             << "numMaxItr: " << numMaxItr << std::endl
             << "numOneRound: " << numOneRound << std::endl
             << "dnId: " << dnId << std::endl
@@ -301,38 +305,42 @@ void evolve(const std::list<std::string> &args)
 
   int othDnId = (dnId + 1) % 2;
 
-  int numTestPlay = 10;
+  int numTestPlay = 15;
 
   float p1WinRate = 0.0;
   int numIteration = 0;
-  while(p1WinRate < 0.65 && numIteration < numMaxItr) {
-    std::cout << "Iteration#: " << numIteration << std::endl;
-    board.init();
-    hist.clear();
+  for(int i = 0; i < 2; i++){
+    while(p1WinRate < 0.65 && numIteration < numMaxItr) {
+      std::cout << "Iteration#: " << numIteration << std::endl;
+      board.init();
+      hist.clear();
 
-    // Produce phase
-    std::cout << "Produce phase start!" << std::endl;
-    sleep(1);
-    selfPlay(board, hist, numOneRound, rolloutDepth, true,
-             dnId, dnId, false);
+      // Produce phase
+      std::cout << "Produce phase start!" << std::endl;
+      sleep(1);
+      selfPlay(board, hist, numOneRound, rolloutDepth, numRollout,
+               true, dnId, dnId, false);
 
-    // Learning phase
-    std::cout << "Learning phase start!" << std::endl;
-    sleep(1);
-    Learner ln(dn[dnId]);
-    ln.loadKifu(numOneRound);
-    ln.learn();
+      // Learning phase
+      std::cout << "Learning phase start!" << std::endl;
+      sleep(1);
+      Learner ln(dn[dnId]);
+      ln.loadKifu(numOneRound);
+      ln.learn();
 
-    // Test phase
-    board.init();
-    hist.clear();
-    std::cout << "Test phase start!" << std::endl;
-    sleep(1);
-    p1WinRate = selfPlay(board, hist, numTestPlay, DEFAULT_ROLLOUT_DEPTH, false, dnId, othDnId, false);
-    numIteration++;
+      // Test phase
+      board.init();
+      hist.clear();
+      std::cout << "Test phase start!" << std::endl;
+      sleep(1);
+      p1WinRate = selfPlay(board, hist, numTestPlay,
+                           DEFAULT_ROLLOUT_DEPTH, NUM_DEFAULT_ROLLOUT,
+                           false, dnId, othDnId, false);
+      numIteration++;
 
-    // save
-    dn[dnId]->saveWeight(filename);
+      // save
+      dn[dnId]->saveWeight(filename);
+    }
   }
 }
 

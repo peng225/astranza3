@@ -8,7 +8,7 @@
 /* Public methods                   */
 /************************************/
 
-BitBoard Player::search(Board& board, bool verbose)
+BitBoard Player::search(Board& board, int numRollout, bool verbose)
 {
     assert(!board.isEnd());
     auto jousekiPos = jsk.useJouseki(board, verbose);
@@ -17,13 +17,15 @@ BitBoard Player::search(Board& board, bool verbose)
     }
 
     expandedTree.clear();
+    minScore = -numRollout * 100;
+    expandThresh = static_cast<int>(0.4 * log(numRollout));
 
     Board rootBoard = board;
     expandedTree[board] = ExpandedNode();
     std::vector<BitBoard> moveList;
     board.getMoveList(moveList);
     expand(board, moveList);
-    for(int i = 0; i < NUM_ROLLOUT; i++){
+    for(int i = 0; i < numRollout; i++){
         // rootノードには親がいないので、適当にSPACEにしておく
         expandedTreeSearch(board, State::SPACE);
         board = rootBoard;
@@ -77,7 +79,7 @@ double Player::expandedTreeSearch(Board& board, State parentTurn)
         board.getMoveList(moveList);
     }
 
-    if(node->isLeaf && EXPAND_THRESH < node->numSelect){
+    if(node->isLeaf && expandThresh < node->numSelect){
         expand(board, moveList);
     }
 
@@ -88,7 +90,7 @@ double Player::expandedTreeSearch(Board& board, State parentTurn)
     else
     {
         BitBoard selectedPos;
-        double maxScore = MIN_SCORE;
+        double maxScore = minScore;
         auto parentNumSelect = node->numSelect;
         for(const auto& pos : moveList){
             auto revPattern = board.putStone(pos);

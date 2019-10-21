@@ -8,10 +8,8 @@
 #include <cmath>
 #include <memory>
 
-constexpr int NUM_ROLLOUT = 1600;
-constexpr double MIN_SCORE = -NUM_ROLLOUT * 100;
+constexpr int NUM_DEFAULT_ROLLOUT = 1600;
 constexpr double PUCT = 0.5;
-const int EXPAND_THRESH = static_cast<int>(0.4 * log(NUM_ROLLOUT));
 constexpr int DEFAULT_ROLLOUT_DEPTH = 4;
 
 struct ExpandedNode
@@ -34,7 +32,9 @@ public:
     //{
     //    jsk.readJousekiFile();
     //}
-    BitBoard search(Board& board, bool verbose = true);
+    BitBoard search(Board& board,
+                    int numRollout = NUM_DEFAULT_ROLLOUT,
+                    bool verbose = true);
 
 private:
     std::unordered_map<Board, ExpandedNode> expandedTree;
@@ -44,6 +44,8 @@ private:
     Jouseki jsk;
     std::shared_ptr<DeepNetwork> dn;
     int rolloutDepth;
+    int minScore;
+    int expandThresh;
 
     double getScore(const Board& board, int numTotalSelect,
                     State parentTurn) const;
