@@ -16,7 +16,7 @@ void Learner::loadKifu(int numLoadKifu)
   char filename[MAX_FILENAME];
 
   for(int i = 0; i < numLoadKifu; i++){
-    sprintf(filename, "kifu/self/kifu%d", i);
+    sprintf(filename, "kifu/evolve/kifu%d", i);
     ifs.open(filename);
     if(!ifs){
       std::cerr << "Too few training data!" << std::endl;
