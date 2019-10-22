@@ -121,9 +121,9 @@ void undo(Board &board, std::list<History> &hist)
   }
 }
 
-void search(Board &board, std::list<History> &hist)
+void search(Board &board, std::list<History> &hist, int rolloutDepth)
 {
-  Player pl(dn[0], DEFAULT_ROLLOUT_DEPTH);
+  Player pl(dn[0], rolloutDepth);
   auto pos = pl.search(board);
   // history
   hist.push_back(History(board, pos));

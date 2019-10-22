@@ -9,13 +9,12 @@
 #include <boost/algorithm/string.hpp>
 
 const int MAX_HISTORY_NUM = 100;
-const int DEFAULT_DEPTH = 14;
 
 int main(int argc, char *argv[])
 {
   Board board;
   std::list<History> hist;
-  int depth = DEFAULT_DEPTH;
+  int depth = DEFAULT_ROLLOUT_DEPTH;
 
   board.display();
   menu::init();
@@ -46,12 +45,12 @@ int main(int argc, char *argv[])
       if(cmdAndArgs.size() < 1){
         std::cerr << "The depth is required." << std::endl;
       }else{
-	depth = atoi(begin(cmdAndArgs)->c_str());
-	std::cout << "Depth was changed to " << depth << "." << std::endl;
+	    depth = atoi(begin(cmdAndArgs)->c_str());
+	    std::cout << "Depth was changed to " << depth << "." << std::endl;
       }
     }    
     else if(command == "search" || command == "s"){
-      menu::search(board, hist);
+      menu::search(board, hist, depth);
     }
 //    else if(command == "setTime" || command == "st"){
 //      int time;
