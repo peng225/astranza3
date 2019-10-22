@@ -91,7 +91,7 @@ void Learner::learn()
         return;
     }
 
-    std::vector<float> input(BOARD_SIZE * BOARD_SIZE);
+    std::vector<float> input(2 * NUM_CELL);
     std::vector<float> correctOutput(2);
     for(int i = 0; i < REPEAT_NUM; i++){
         for(const auto& km : kyokumen)

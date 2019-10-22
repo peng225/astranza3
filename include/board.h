@@ -13,14 +13,14 @@ enum class Direction{LEFT_UP, UP, RIGHT_UP, RIGHT,
 typedef uint64_t BitBoard;
 
 
-const BitBoard MSB_ONLY_64 = 0x8000000000000000ULL;
-const int BOARD_SIZE = 8;
-const int NUM_CELL = 64;
-const int NUM_DIRECTION = 8;
-const BitBoard INIT_BLACK = 0x0000000810000000ULL;
-const BitBoard INIT_WHITE = 0x0000001008000000ULL;
-const BitBoard LEFT_EDGE = 0x7f7f7f7f7f7f7f7fULL;
-const BitBoard RIGHT_EDGE = 0xfefefefefefefefeULL;
+constexpr BitBoard MSB_ONLY_64 = 0x8000000000000000ULL;
+constexpr int BOARD_SIZE = 8;
+constexpr int NUM_CELL = BOARD_SIZE * BOARD_SIZE;
+constexpr int NUM_DIRECTION = 8;
+constexpr BitBoard INIT_BLACK = 0x0000000810000000ULL;
+constexpr BitBoard INIT_WHITE = 0x0000001008000000ULL;
+constexpr BitBoard LEFT_EDGE = 0x7f7f7f7f7f7f7f7fULL;
+constexpr BitBoard RIGHT_EDGE = 0xfefefefefefefefeULL;
 
 const Direction DIRS[NUM_DIRECTION] = {
                      Direction::LEFT_UP,

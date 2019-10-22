@@ -149,7 +149,7 @@ double Player::rollout(Board& board)
     }
     else
     {
-        std::vector<float> input(BOARD_SIZE * BOARD_SIZE);
+        std::vector<float> input(2 * NUM_CELL);
         board.toVector(input);
         assert(dn != nullptr);
         auto out = dn->feedInput(input);

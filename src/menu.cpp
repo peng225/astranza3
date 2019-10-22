@@ -15,7 +15,7 @@ void init()
     for(int i = 0; i < NUM_DN_OBJ; i++){
         menu::dn[i] = std::make_shared<DeepNetwork>();
         // Construct network
-        dn[i]->setInputInfo(DataSize(BOARD_SIZE, BOARD_SIZE), 1);
+        dn[i]->setInputInfo(DataSize(BOARD_SIZE, BOARD_SIZE), 2);
 
         auto l1 = std::make_shared<ConvolutionLayer>(1, 4, 8);
         dn[i]->addLayer(l1);
