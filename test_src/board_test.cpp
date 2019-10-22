@@ -57,3 +57,21 @@ TEST(board, undo)
     EXPECT_EQ(orgBoard, board);
 }
 
+TEST(board, toVector)
+{
+    Board board;
+    board.init();
+    std::vector<float> input(2 * NUM_CELL);
+
+    board.toVector(input);
+    EXPECT_EQ(0, input.at(0));
+    EXPECT_EQ(1, input.at(28));
+    EXPECT_EQ(1, input.at(35));
+    EXPECT_EQ(0, input.at(NUM_CELL - 1));
+
+    EXPECT_EQ(0, input.at(NUM_CELL));
+    EXPECT_EQ(1, input.at(NUM_CELL + 27));
+    EXPECT_EQ(1, input.at(NUM_CELL + 36));
+    EXPECT_EQ(0, input.at(2 * NUM_CELL - 1));
+}
+
