@@ -307,10 +307,13 @@ void evolve(const std::list<std::string> &args)
 
   int numTestPlay = 15;
 
-  float p1WinRate = 0.0;
-  int numIteration = 0;
+  float pl1WinRate;
+  int numIteration;
+
   for(int i = 0; i < 2; i++){
-    while(p1WinRate < 0.65 && numIteration < numMaxItr) {
+    numIteration = 0;
+    pl1WinRate = 0;
+    while(pl1WinRate < 0.65 && numIteration < numMaxItr) {
       std::cout << "Iteration#: " << numIteration << std::endl;
       board.init();
       hist.clear();
@@ -333,13 +336,14 @@ void evolve(const std::list<std::string> &args)
       hist.clear();
       std::cout << "Test phase start!" << std::endl;
       sleep(1);
-      p1WinRate = selfPlay(board, hist, numTestPlay,
-                           DEFAULT_ROLLOUT_DEPTH, NUM_DEFAULT_ROLLOUT,
-                           false, dnId, othDnId, false);
-      numIteration++;
+      pl1WinRate = selfPlay(board, hist, numTestPlay,
+                            DEFAULT_ROLLOUT_DEPTH, NUM_DEFAULT_ROLLOUT,
+                            false, dnId, othDnId, false);
 
       // save
       dn[dnId]->saveWeight(filename);
+
+      numIteration++;
     }
   }
 }

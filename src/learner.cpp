@@ -109,6 +109,9 @@ void Learner::learn()
             }
             dn->backPropagate(input, correctOutput);
         }
+        // randomize
+        Random rnd;
+        random_shuffle(kyokumen.begin(), kyokumen.end(), rnd);
     }
 
     std::cout << "check" << std::endl;
