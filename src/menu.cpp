@@ -279,8 +279,8 @@ void loadWeight(const std::list<std::string> &args)
 
 void evolve(const std::list<std::string> &args)
 {
-  if(args.size() < 6){
-    std::cerr << "usage: evolve [rollout depth] [num rollout] [num max itr] [num one round] [dnID 0 or 1] [filename]" << std::endl;
+  if(args.size() < 7){
+    std::cerr << "usage: evolve [rollout depth] [num rollout] [num max itr] [num one round] [num generation] [dnID 0 or 1] [filename]" << std::endl;
     return;
   }
 
@@ -295,6 +295,8 @@ void evolve(const std::list<std::string> &args)
   itr++;
   auto numOneRound = atoi(itr->c_str());
   itr++;
+  auto numGeneration = atoi(itr->c_str());
+  itr++;
   auto dnId = atoi(itr->c_str());
   itr++;
   auto filename = itr->c_str();
@@ -303,6 +305,7 @@ void evolve(const std::list<std::string> &args)
             << "numRollout: " << numRollout << std::endl
             << "numMaxItr: " << numMaxItr << std::endl
             << "numOneRound: " << numOneRound << std::endl
+            << "numGeneration: " << numGeneration << std::endl
             << "dnId: " << dnId << std::endl
             << "filename: " << filename << std::endl;
 
@@ -313,11 +316,13 @@ void evolve(const std::list<std::string> &args)
 
   double requiredWinRate = (1.96*(sqrt(numTestPlay*0.25)) + numTestPlay*0.5) / numTestPlay;
   std::cout << "requiredWinRate: " << requiredWinRate << std::endl;
+  std::cout << std::endl;
 
   float pl1WinRate;
   int numIteration;
 
-  for(int i = 0; i < 2; i++){
+  for(int i = 0; i < numGeneration; i++){
+    std::cout << "Generation#: " << i << std::endl;
     numIteration = 0;
     pl1WinRate = 0;
     while(pl1WinRate < requiredWinRate && numIteration < numMaxItr) {
@@ -330,6 +335,7 @@ void evolve(const std::list<std::string> &args)
       sleep(1);
       selfPlay(board, hist, numOneRound, rolloutDepth, numRollout,
                true, dnId, dnId, false);
+      std::cout << std::endl;
 
       // Learning phase
       std::cout << "Learning phase start!" << std::endl;
@@ -337,6 +343,7 @@ void evolve(const std::list<std::string> &args)
       Learner ln(dn[dnId]);
       ln.loadKifu(numOneRound);
       ln.learn();
+      std::cout << std::endl;
 
       // Test phase
       board.init();
@@ -346,11 +353,15 @@ void evolve(const std::list<std::string> &args)
       pl1WinRate = selfPlay(board, hist, numTestPlay,
                             DEFAULT_ROLLOUT_DEPTH, NUM_DEFAULT_ROLLOUT,
                             false, dnId, othDnId, false);
+      std::cout << std::endl;
 
       // save
       dn[dnId]->saveWeight(filename);
 
       numIteration++;
+    }
+    if(pl1WinRate < requiredWinRate) {
+      std::cout << "WARNING: Could not evolve enough at the generation#" << i << ". " << std::endl;
     }
     dn[othDnId]->loadWeight(filename);
   }
