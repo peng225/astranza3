@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cassert>
 #include <unistd.h>
+#include <cmath>
 
 namespace menu
 {
@@ -305,7 +306,11 @@ void evolve(const std::list<std::string> &args)
 
   int othDnId = (dnId + 1) % 2;
 
-  int numTestPlay = 15;
+  int numTestPlay = std::max(15, numOneRound/10);
+  std::cout << "numTestPlay: " << numTestPlay << std::endl;
+
+  double requiredWinRate = (1.96*(sqrt(numTestPlay*0.25)) + numTestPlay*0.5) / numTestPlay;
+  std::cout << "requiredWinRate: " << requiredWinRate << std::endl;
 
   float pl1WinRate;
   int numIteration;
@@ -313,7 +318,7 @@ void evolve(const std::list<std::string> &args)
   for(int i = 0; i < 2; i++){
     numIteration = 0;
     pl1WinRate = 0;
-    while(pl1WinRate < 0.65 && numIteration < numMaxItr) {
+    while(pl1WinRate < requiredWinRate && numIteration < numMaxItr) {
       std::cout << "Iteration#: " << numIteration << std::endl;
       board.init();
       hist.clear();
