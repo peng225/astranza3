@@ -158,7 +158,8 @@ void Board::getMoveList(std::vector<BitBoard>& moveList) const
 
 void Board::toVector(std::vector<float>& vec) const
 {
-    assert(vec.size() == 2 * NUM_CELL);
+    vec.clear();
+    vec.resize(2 * NUM_CELL);
     for(int i = 0; i < BOARD_SIZE; i++){
         BitBoard pos = MSB_ONLY_64;
         pos = pos >> (BOARD_SIZE * i);
