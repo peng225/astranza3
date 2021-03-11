@@ -129,7 +129,7 @@ double Player::rollout(Board& board)
     //std::cout << "playout of " << (int)orgTurn << std::endl;
     while(!board.isEnd() && count < rolloutDepth){
         board.getMoveList(moveList);
-        auto pos = moveList.at(dist(engine) % moveList.size());
+        auto pos = moveList[dist(engine) % moveList.size()];
         board.putStone(pos);
         moveList.clear();
         count++;

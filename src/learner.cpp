@@ -57,7 +57,7 @@ void Learner::loadKifu(int numLoadKifu)
       }
       // tboard.display();
       // 正解の指し手を保存していく
-      kyokumen.push_back(CorrectMove(board, pos, winner));
+      kyokumen.emplace_back(CorrectMove(board, pos, winner));
 
       // boardを一手ずつ進めていく
       // パスなら手順を入れ替えてやり直し
@@ -140,6 +140,4 @@ void Learner::learn()
         if(count == 10) break;
     }
 }
-
-
 

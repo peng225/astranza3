@@ -95,7 +95,7 @@ void put(Board &board, std::list<History> &hist, const std::list<std::string> &a
   }
   else{
     // history
-    hist.push_back(History(board, pos));
+    hist.emplace_back(History(board, pos));
 
     board.display();
 
@@ -126,7 +126,7 @@ void search(Board &board, std::list<History> &hist, int rolloutDepth)
   Player pl(dn[0], rolloutDepth);
   auto pos = pl.search(board);
   // history
-  hist.push_back(History(board, pos));
+  hist.emplace_back(History(board, pos));
 
   board.display();
 

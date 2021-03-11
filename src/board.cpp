@@ -164,9 +164,9 @@ void Board::toVector(std::vector<float>& vec) const
         pos = pos >> (BOARD_SIZE * i);
         for(int j = 0; j < BOARD_SIZE; j++){
             if(getState(pos) == State::BLACK){
-              vec.at(i * BOARD_SIZE + j) = 1;
+              vec[i * BOARD_SIZE + j] = 1;
             } else if(getState(pos) == State::WHITE){
-              vec.at(NUM_CELL + i * BOARD_SIZE + j) = 1;
+              vec[NUM_CELL + i * BOARD_SIZE + j] = 1;
             }
             pos = Board::transfer(pos, Direction::RIGHT);
         }
