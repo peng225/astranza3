@@ -348,5 +348,5 @@ void evolve(const std::list<std::string> &args)
   }
 }
 
-}
+} // namespace menu end
 
