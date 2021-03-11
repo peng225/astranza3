@@ -152,6 +152,7 @@ float selfPlay(Board &board, std::list<History> &hist,
   int numPl1Win = 0;
   int numDraw = 0;
   for(int i = 0; i < numSelfPlay; i++){
+    std::cout << "Self play #" << i << " start." << std::endl;
     BitBoard pos;
     while(!board.isEnd()){
       if(board.getTurn() == State::BLACK){
@@ -182,6 +183,7 @@ float selfPlay(Board &board, std::list<History> &hist,
         ofs << xy.first << " " << xy.second << std::endl;
       }
       ofs.close();
+      std::cout << "Saved a kifu to " << "\"kifu/evolve/kifu" + std::to_string(i) << "\"." << std::endl;
     }
     board.init();
     hist.clear();
