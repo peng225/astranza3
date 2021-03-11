@@ -4,6 +4,7 @@
 #include <list>
 #include <stack>
 #include <algorithm>
+#include <vector>
 
 
 enum class State{BLACK = -1, WHITE = 1, SPACE = 0};
