@@ -352,6 +352,7 @@ void evolve(const std::list<std::string> &args)
 
       numIteration++;
     }
+    dn[othDnId]->loadWeight(filename);
   }
 }
 
