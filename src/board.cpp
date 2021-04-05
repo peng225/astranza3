@@ -174,6 +174,17 @@ void Board::toVector(std::vector<float>& vec) const
     }
 }
 
+void Board::flipWithLTtoRDDiagonal()
+{
+   black = flipBBWithLTtoRDDiagonal(black);
+   white = flipBBWithLTtoRDDiagonal(white);
+}
+
+void Board::flipWithRTtoLDDiagonal()
+{
+   black = flipBBWithRTtoLDDiagonal(black);
+   white = flipBBWithRTtoLDDiagonal(white);
+}
 
 bool Board::operator==(const Board &obj) const
 {
@@ -231,7 +242,34 @@ BitBoard Board::transfer(BitBoard oneBit, Direction d)
   }
 }
 
+BitBoard Board::flipBBWithLTtoRDDiagonal(BitBoard bitBoard)
+{
+    BitBoard retBoard = 0ULL;
+    for(int y = 0; y < BOARD_SIZE; y++) {
+        for(int x = 0; x < BOARD_SIZE; x++) {
+            if(bitBoard & xyToPos(x, y)) {
+                // swap x and y
+                retBoard |= xyToPos(y, x);
+            }
+        }
+    }
+    return retBoard;
+}
 
+BitBoard Board::flipBBWithRTtoLDDiagonal(BitBoard bitBoard)
+{
+    BitBoard retBoard = 0ULL;
+    for(int y = 0; y < BOARD_SIZE; y++) {
+        for(int x = 0; x < BOARD_SIZE; x++) {
+            if(bitBoard & xyToPos(x, y)) {
+                retBoard |= xyToPos(BOARD_SIZE - y - 1,
+                                    BOARD_SIZE - x - 1);
+            }
+        }
+    }
+    return retBoard;
+
+}
 
 /************************************/
 /* Private methods                  */

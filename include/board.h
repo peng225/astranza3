@@ -84,6 +84,10 @@ class Board
   void getMoveList(std::vector<BitBoard>& moveList) const;
   void toVector(std::vector<float>& vec) const;
 
+  /* flip the board with a diagonal */
+  void flipWithLTtoRDDiagonal();
+  void flipWithRTtoLDDiagonal();
+
   bool operator==(const Board &obj) const;
   std::size_t getHash() const
   {
@@ -93,6 +97,8 @@ class Board
   static BitBoard xyToPos(int x, int y);
   static bool isValidPos(BitBoard pos);
   static BitBoard transfer(BitBoard oneBit, Direction d);
+  static BitBoard flipBBWithLTtoRDDiagonal(BitBoard bitBoard);
+  static BitBoard flipBBWithRTtoLDDiagonal(BitBoard bitBoard);
 
  private:
   BitBoard black;

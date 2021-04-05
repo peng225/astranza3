@@ -57,7 +57,28 @@ void Learner::loadKifu(int numLoadKifu)
       }
       // tboard.display();
       // 正解の指し手を保存していく
+      // 学習データを増やすために反転したデータも生成する
       kyokumen.emplace_back(CorrectMove(board, pos, winner));
+
+      auto orgPos = pos;
+
+      board.flipWithLTtoRDDiagonal();
+      pos = Board::flipBBWithLTtoRDDiagonal(pos);
+      kyokumen.emplace_back(CorrectMove(board, pos, winner));
+
+      board.flipWithRTtoLDDiagonal();
+      pos = Board::flipBBWithRTtoLDDiagonal(pos);
+      kyokumen.emplace_back(CorrectMove(board, pos, winner));
+
+      board.flipWithLTtoRDDiagonal();
+      pos = Board::flipBBWithLTtoRDDiagonal(pos);
+      kyokumen.emplace_back(CorrectMove(board, pos, winner));
+
+      // 指し手を進められるように元に戻す
+      board.flipWithRTtoLDDiagonal();
+      pos = Board::flipBBWithRTtoLDDiagonal(pos);
+
+      assert(pos == orgPos);
 
       // boardを一手ずつ進めていく
       // パスなら手順を入れ替えてやり直し
@@ -71,6 +92,9 @@ void Learner::loadKifu(int numLoadKifu)
       }
     }
     // 最後の局面は手が決まってしまっており、学習に利用できないので破棄
+    kyokumen.pop_back();
+    kyokumen.pop_back();
+    kyokumen.pop_back();
     kyokumen.pop_back();
     ifs.close();
   }
