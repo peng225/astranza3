@@ -179,8 +179,8 @@ BitBoard Player::selectMove(Board& board, bool verbose)
             maxNumSelect = numSelect;
             selectedPos = pos;
         }
-        auto xy = Board::posToXY(pos);
         if(verbose) {
+          auto xy = Board::posToXY(pos);
           std::cout << "pos: (" << xy.first + 1 << ", " << xy.second + 1
                     << "), value: " << numSelect << ", "
                     << (myTurn != board.getTurn() ?
