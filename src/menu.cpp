@@ -312,10 +312,11 @@ void evolve(const std::list<std::string> &args)
   int othDnId = (dnId + 1) % 2;
 
   int numTestPlay = std::max(20, numOneRound/10);
+  numTestPlay = (numTestPlay + 1) / 2 * 2;
   std::cout << "numTestPlay: " << numTestPlay << std::endl;
 
   // np + Z_{0.025} * √(np(1-p))
-  double requiredWinRate = (numTestPlay*0.5 + 1.96*(sqrt(numTestPlay*0.25))) / numTestPlay;
+  double requiredWinRate = std::min(1.0, (numTestPlay*0.5 + 1.96*(sqrt(numTestPlay*0.25))) / numTestPlay);
   std::cout << "requiredWinRate: " << requiredWinRate << std::endl;
   std::cout << std::endl;
 
@@ -350,10 +351,16 @@ void evolve(const std::list<std::string> &args)
       board.init();
       hist.clear();
       std::cout << "Test phase start!" << std::endl;
-      sleep(1);
-      pl1WinRate = selfPlay(board, hist, numTestPlay,
+      std::cout << "BLACK phase start!" << std::endl;
+      pl1WinRate = selfPlay(board, hist, numTestPlay/2,
                             DEFAULT_ROLLOUT_DEPTH, NUM_DEFAULT_ROLLOUT,
                             false, dnId, othDnId, false);
+      std::cout << "WHITE phase start!" << std::endl;
+      pl1WinRate += 1.0 - selfPlay(board, hist, numTestPlay/2,
+                            DEFAULT_ROLLOUT_DEPTH, NUM_DEFAULT_ROLLOUT,
+                            false, othDnId, dnId, false);
+      pl1WinRate /= 2;
+      std::cout << "Total win rate: " << 100 * pl1WinRate << "%" << std::endl;
 
       // save
       dn[dnId]->saveWeight(filename + "_" + std::to_string(i));
