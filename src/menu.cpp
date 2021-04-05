@@ -311,10 +311,11 @@ void evolve(const std::list<std::string> &args)
 
   int othDnId = (dnId + 1) % 2;
 
-  int numTestPlay = std::max(15, numOneRound/10);
+  int numTestPlay = std::max(20, numOneRound/10);
   std::cout << "numTestPlay: " << numTestPlay << std::endl;
 
-  double requiredWinRate = (1.96*(sqrt(numTestPlay*0.25)) + numTestPlay*0.5) / numTestPlay;
+  // np + Z_{0.025} * √(np(1-p))
+  double requiredWinRate = (numTestPlay*0.5 + 1.96*(sqrt(numTestPlay*0.25))) / numTestPlay;
   std::cout << "requiredWinRate: " << requiredWinRate << std::endl;
   std::cout << std::endl;
 
@@ -353,14 +354,17 @@ void evolve(const std::list<std::string> &args)
       pl1WinRate = selfPlay(board, hist, numTestPlay,
                             DEFAULT_ROLLOUT_DEPTH, NUM_DEFAULT_ROLLOUT,
                             false, dnId, othDnId, false);
-      std::cout << std::endl;
 
       // save
       dn[dnId]->saveWeight(filename);
+      std::cout << "saved the weight." << std::endl;
+      std::cout << std::endl;
 
       numIteration++;
     }
-    if(pl1WinRate < requiredWinRate) {
+    if(requiredWinRate <= pl1WinRate ) {
+      std::cout << "Evolved enough at the generation#" << i << ". " << std::endl;
+    } else {
       std::cout << "WARNING: Could not evolve enough at the generation#" << i << ". " << std::endl;
     }
     dn[othDnId]->loadWeight(filename);
