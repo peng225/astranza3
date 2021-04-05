@@ -91,6 +91,9 @@ void Learner::loadKifu(int numLoadKifu)
         exit(1);
       }
     }
+    assert(board.isEnd());
+    assert(board.getWinner() == winner);
+
     // 最後の局面は手が決まってしまっており、学習に利用できないので破棄
     kyokumen.pop_back();
     kyokumen.pop_back();
