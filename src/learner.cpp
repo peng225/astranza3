@@ -131,7 +131,8 @@ void Learner::learn()
                 correctOutput.at(0) = 0.5;
                 correctOutput.at(1) = 0.5;
             }
-            dn->backPropagate(input, correctOutput);
+            dn->backPropagate(input, correctOutput,
+                km.board.getTesuu() / static_cast<double>(NUM_CELL));
         }
         // randomize
         Random rnd;
