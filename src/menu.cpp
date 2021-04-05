@@ -299,7 +299,7 @@ void evolve(const std::list<std::string> &args)
   itr++;
   auto dnId = atoi(itr->c_str());
   itr++;
-  auto filename = itr->c_str();
+  auto filename = *itr;
 
   std::cout << "rolloutDepth: " << rolloutDepth << std::endl
             << "numRollout: " << numRollout << std::endl
@@ -356,7 +356,7 @@ void evolve(const std::list<std::string> &args)
                             false, dnId, othDnId, false);
 
       // save
-      dn[dnId]->saveWeight(filename);
+      dn[dnId]->saveWeight(filename + "_" + std::to_string(i));
       std::cout << "saved the weight." << std::endl;
       std::cout << std::endl;
 
