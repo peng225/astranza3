@@ -121,6 +121,7 @@ void Learner::learn()
     std::vector<float> input;
     std::vector<float> correctOutput(2);
     for(int i = 0; i < REPEAT_NUM; i++){
+        std::cout << "learning iteration#: " << i << std::endl;
         for(const auto& km : kyokumen)
         {
             km.board.toVector(input);
@@ -164,8 +165,31 @@ void Learner::learn()
         assert(out.back().size() == 2);
         std::cout << "out, cout: " << out.back().at(0) << ", " << correctOutput.at(0) << std::endl;
         std::cout << "         : " << out.back().at(1) << ", " << correctOutput.at(1) << std::endl;
+
         count++;
-        if(count == 10) break;
+        if(count == 15) break;
     }
+    std::cout << "all black input:" << std::endl;
+    input.clear();
+    input.resize(2 * NUM_CELL);
+    for(int i = 0; static_cast<size_t>(i) < NUM_CELL; i++) {
+        input.at(i) = 1;
+    }
+    auto out = dn->feedInput(input);
+    assert(out.back().size() == 2);
+    std::cout << "out: " << out.back().at(0) << std::endl;
+    std::cout << "   : " << out.back().at(1) << std::endl;
+
+    std::cout << "all white input:" << std::endl;
+    input.clear();
+    input.resize(2 * NUM_CELL);
+    for(int i = 0; static_cast<size_t>(i) < NUM_CELL; i++) {
+        input.at(i + NUM_CELL) = 1;
+    }
+    out = dn->feedInput(input);
+    assert(out.back().size() == 2);
+    std::cout << "out: " << out.back().at(0) << std::endl;
+    std::cout << "   : " << out.back().at(1) << std::endl;
+    std::cout << std::endl;
 }
 

@@ -325,6 +325,10 @@ BitBoard Board::flipBBWithRTtoLDDiagonal(BitBoard bitBoard)
 BitBoard Board::putStone(BitBoard pos, bool clearClds)
 { 
   if(!isValidPos(pos)){
+    auto posXY = posToXY(pos);
+    std::cerr << "invalid pos = (" << posXY.first << ", " << posXY.second
+        << ") @ " << __func__ << std::endl;
+    this->display();
     return 0;
   }
   
@@ -332,6 +336,10 @@ BitBoard Board::putStone(BitBoard pos, bool clearClds)
   
   // 空白の位置にのみ石を置ける
   if(((black | white) & pos) != 0){
+    auto posXY = posToXY(pos);
+    std::cerr << "cannot put stone on an occupied pos = (" << posXY.first << ", " << posXY.second
+        << ") @ " << __func__ << std::endl;
+    this->display();
     return 0;
   }
 
@@ -355,6 +363,10 @@ BitBoard Board::putStone(BitBoard pos, bool clearClds)
 
   // 石の反転を適用
   if(revPattern == 0){
+    auto posXY = posToXY(pos);
+    std::cerr << "reversed no stones, pos = (" << posXY.first << ", " << posXY.second
+        << ") @ " << __func__ << std::endl;
+    this->display();
     return 0;
   }else if(ME == black){
     black ^= pos | revPattern;
