@@ -36,7 +36,9 @@ int main(int argc, char *argv[])
     }
 
     if(command == "self" || command == "se"){
-      menu::selfPlay(board, hist, cmdAndArgs);
+      board.init();
+      hist.clear();
+      menu::selfPlay(cmdAndArgs);
     }
     else if(command == "undo" || command == "u"){
       menu::undo(board, hist);

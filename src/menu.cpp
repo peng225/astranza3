@@ -5,6 +5,7 @@
 #include <cassert>
 #include <unistd.h>
 #include <cmath>
+#include <omp.h>
 
 namespace menu
 {
@@ -138,21 +139,27 @@ void search(Board &board, std::list<History> &hist, int rolloutDepth)
 }
 
 
-float selfPlay(Board &board, std::list<History> &hist,
-              int numSelfPlay,
-              int rolloutDepth,
-              int numRollout,
-              bool shouldSaveKifu,
-              int dnId1,
-              int dnId2,
-              bool verbose)
+float selfPlay(int numSelfPlay,
+               int rolloutDepth,
+               int numRollout,
+               bool shouldSaveKifu,
+               int dnId1,
+               int dnId2,
+               bool verbose)
 {
-  Player pl1(dn[dnId1], rolloutDepth);
-  Player pl2(dn[dnId2], rolloutDepth);
   int numPl1Win = 0;
   int numDraw = 0;
+  #pragma omp parallel for
   for(int i = 0; i < numSelfPlay; i++){
-    std::cout << "Self play #" << i << " start." << std::endl;
+    #pragma omp critical(print)
+    {
+      std::cout << "Self play #" << i << " start." << std::endl;
+    }
+    Player pl1(dn[dnId1], rolloutDepth);
+    Player pl2(dn[dnId2], rolloutDepth);
+    Board board;
+    board.init();
+    std::list<History> hist;
     BitBoard pos;
     while(!board.isEnd()){
       if(board.getTurn() == State::BLACK){
@@ -163,27 +170,42 @@ float selfPlay(Board &board, std::list<History> &hist,
       // history
       hist.emplace_back(History(board, pos));
       if(verbose){
-        board.display();
+        #pragma omp critical(print)
+        {
+          board.display();
+        }
       }
     }
 
     // 終了処理
-    printWinner(board);
+    #pragma omp critical(print)
+    {
+      printWinner(board);
+    }
     auto winner = board.getWinner();
-    if(winner == State::BLACK){
-      numPl1Win++;
-    }else if(winner == State::SPACE){
-      numDraw++;
+    #pragma omp critical(numPl1WinAndNumDrawUpdate)
+    {
+      if(winner == State::BLACK){
+        numPl1Win++;
+      }else if(winner == State::SPACE){
+        numDraw++;
+      }
     }
     if(shouldSaveKifu){
-      std::ofstream ofs("kifu/evolve/kifu" + std::to_string(i));
-      ofs << static_cast<int>(board.getWinner()) << std::endl;
-      for(auto h : hist){
-        auto xy = Board::posToXY(h.getPos());
-        ofs << xy.first << " " << xy.second << std::endl;
+      #pragma omp critical(saveFile)
+      {
+        std::ofstream ofs("kifu/evolve/kifu" + std::to_string(i));
+        ofs << static_cast<int>(board.getWinner()) << std::endl;
+        for(auto h : hist){
+          auto xy = Board::posToXY(h.getPos());
+          ofs << xy.first << " " << xy.second << std::endl;
+        }
+        ofs.close();
       }
-      ofs.close();
-      std::cout << "Saved a kifu to " << "\"kifu/evolve/kifu" + std::to_string(i) << "\"." << std::endl;
+      #pragma omp critical(print)
+      {
+        std::cout << "Saved a kifu to " << "\"kifu/evolve/kifu" + std::to_string(i) << "\"." << std::endl;
+      }
     }
     board.init();
     hist.clear();
@@ -203,7 +225,7 @@ float selfPlay(Board &board, std::list<History> &hist,
   return p1WinRate;
 }
 
-void selfPlay(Board &board, std::list<History> &hist, const std::list<std::string> &args)
+void selfPlay(const std::list<std::string> &args)
 {
   if(args.size() < 5){
     std::cerr << "usage: self [numSelfPlay] [rollout depth] [0: not save, 1: save] [dnID 0 or 1] [dnID 0 or 1]" << std::endl;
@@ -221,7 +243,7 @@ void selfPlay(Board &board, std::list<History> &hist, const std::list<std::strin
   itr++;
   auto dnId2 = atoi(itr->c_str());
 
-  selfPlay(board, hist, numSelfPlay, rolloutDepth, NUM_DEFAULT_ROLLOUT,
+  selfPlay(numSelfPlay, rolloutDepth, NUM_DEFAULT_ROLLOUT,
            shouldSaveKifu, dnId1, dnId2, true);
 }
 
@@ -284,8 +306,6 @@ void evolve(const std::list<std::string> &args)
     return;
   }
 
-  Board board;
-  std::list<History> hist;
   std::list<std::string>::const_iterator itr = std::begin(args);
   auto rolloutDepth = atoi(itr->c_str());
   itr++;
@@ -329,13 +349,11 @@ void evolve(const std::list<std::string> &args)
     pl1WinRate = 0;
     while(pl1WinRate < requiredWinRate && numIteration < numMaxItr) {
       std::cout << "Iteration#: " << numIteration << std::endl;
-      board.init();
-      hist.clear();
 
       // Produce phase
       std::cout << "Produce phase start!" << std::endl;
       sleep(1);
-      selfPlay(board, hist, numOneRound, rolloutDepth, numRollout,
+      selfPlay(numOneRound, rolloutDepth, numRollout,
                true, dnId, dnId, false);
       std::cout << std::endl;
 
@@ -348,15 +366,13 @@ void evolve(const std::list<std::string> &args)
       std::cout << std::endl;
 
       // Test phase
-      board.init();
-      hist.clear();
       std::cout << "Test phase start!" << std::endl;
       std::cout << "BLACK phase start!" << std::endl;
-      pl1WinRate = selfPlay(board, hist, numTestPlay/2,
+      pl1WinRate = selfPlay(numTestPlay/2,
                             DEFAULT_ROLLOUT_DEPTH, NUM_DEFAULT_ROLLOUT,
                             false, dnId, othDnId, false);
       std::cout << "WHITE phase start!" << std::endl;
-      pl1WinRate += 1.0 - selfPlay(board, hist, numTestPlay/2,
+      pl1WinRate += 1.0 - selfPlay(numTestPlay/2,
                             DEFAULT_ROLLOUT_DEPTH, NUM_DEFAULT_ROLLOUT,
                             false, othDnId, dnId, false);
       pl1WinRate /= 2;
