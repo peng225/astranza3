@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <climits>
 
 
 /************************************/
@@ -17,7 +18,7 @@ BitBoard Player::search(Board& board, int numRollout, bool verbose)
     }
 
     expandedTree.clear();
-    minScore = -numRollout * 100;
+    minScore = INT_MIN;
     expandThresh = static_cast<int>(0.4 * log(numRollout));
 
     Board rootBoard = board;
