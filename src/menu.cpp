@@ -396,7 +396,7 @@ void evolve(const std::list<std::string> &args)
     } else {
       std::cout << "WARNING: Could not evolve enough at the generation#" << i << ". " << std::endl;
     }
-    dn[othDnId]->loadWeight(filename);
+    dn[othDnId]->loadWeight(filename + "_" + std::to_string(i));
   }
 }
 
