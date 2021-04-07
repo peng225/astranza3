@@ -92,13 +92,13 @@ void put(Board &board, std::list<History> &hist, const std::list<std::string> &a
   // BitBoard revPattern;  
   // if((revPattern = board.putStone(x, y)) == 0){
   // if(!board.putStone(pos, true)){
+  // history
+  hist.emplace_back(History(board, pos));
   if(!board.putStone(pos)){
     std::cout << "Illegal move!" << std::endl;
+    hist.pop_back();
   }
   else{
-    // history
-    hist.emplace_back(History(board, pos));
-
     board.display();
 
     // 終了処理
@@ -126,9 +126,14 @@ void undo(Board &board, std::list<History> &hist)
 void search(Board &board, std::list<History> &hist, int rolloutDepth)
 {
   Player pl(dn[0], rolloutDepth);
+  auto orgBoard = board;
   auto pos = pl.search(board);
-  // history
-  hist.emplace_back(History(board, pos));
+  if(pos != 0) {
+    // history
+    hist.emplace_back(History(orgBoard, pos));
+  } else {
+    std::cerr << "Failed to put stone." << std::endl;
+  }
 
   board.display();
 
