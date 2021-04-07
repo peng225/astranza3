@@ -370,6 +370,11 @@ void evolve(const std::list<std::string> &args)
       ln.learn();
       std::cout << std::endl;
 
+      // save
+      dn[dnId]->saveWeight(filename + "_" + std::to_string(i));
+      std::cout << "saved the weight." << std::endl;
+      std::cout << std::endl;
+
       // Test phase
       std::cout << "Test phase start!" << std::endl;
       std::cout << "BLACK phase start!" << std::endl;
@@ -382,10 +387,6 @@ void evolve(const std::list<std::string> &args)
                             false, othDnId, dnId, false);
       pl1WinRate /= 2;
       std::cout << "Total win rate: " << 100 * pl1WinRate << "%" << std::endl;
-
-      // save
-      dn[dnId]->saveWeight(filename + "_" + std::to_string(i));
-      std::cout << "saved the weight." << std::endl;
       std::cout << std::endl;
 
       numIteration++;
