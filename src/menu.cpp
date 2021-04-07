@@ -19,26 +19,35 @@ void init()
         // Construct network
         dn[i]->setInputInfo(DataSize(BOARD_SIZE, BOARD_SIZE), 2);
 
-        auto l1 = std::make_shared<ConvolutionLayer>(1, 4, 8);
+        auto l1 = std::make_shared<ConvolutionLayer>(1, 4, 16);
         dn[i]->addLayer(l1);
+
+        auto l1_5 = std::make_shared<StandardizeLayer>();
+        dn[i]->addLayer(l1_5);
 
         auto l2 = std::make_shared<ReLULayer>();
         dn[i]->addLayer(l2);
 
-        auto l3 = std::make_shared<PoolingLayer>(1, 4);
+        auto l3 = std::make_shared<PoolingLayer>(1, 3);
         dn[i]->addLayer(l3);
 
-        auto l4 = std::make_shared<ConvolutionLayer>(1, 3, 16);
+        auto l4 = std::make_shared<ConvolutionLayer>(1, 3, 32);
         dn[i]->addLayer(l4);
+
+        auto l4_5 = std::make_shared<StandardizeLayer>();
+        dn[i]->addLayer(l4_5);
 
         auto l5 = std::make_shared<ReLULayer>();
         dn[i]->addLayer(l5);
 
-        auto l6 = std::make_shared<PoolingLayer>(1, 3);
+        auto l6 = std::make_shared<PoolingLayer>(1, 2);
         dn[i]->addLayer(l6);
 
-        auto l7 = std::make_shared<FullConnectLayer>(DataSize(40, 1));
+        auto l7 = std::make_shared<FullConnectLayer>(DataSize(48, 1));
         dn[i]->addLayer(l7);
+
+        auto l7_5 = std::make_shared<StandardizeLayer>();
+        dn[i]->addLayer(l7_5);
 
         auto l8 = std::make_shared<SigmoidLayer>();
         dn[i]->addLayer(l8);
