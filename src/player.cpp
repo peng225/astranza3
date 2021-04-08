@@ -90,7 +90,7 @@ double Player::expandedTreeSearch(Board& board, State parentTurn)
     }
     else
     {
-        BitBoard selectedPos;
+        BitBoard selectedPos = 0;
         double maxScore = minScore;
         auto parentNumSelect = node->numSelect;
         for(const auto& pos : moveList){
@@ -165,7 +165,7 @@ double Player::rollout(Board& board)
 
 BitBoard Player::selectMove(Board& board, bool verbose)
 {
-    BitBoard selectedPos;
+    BitBoard selectedPos = 0;
     int maxNumSelect = -1;
     std::vector<BitBoard> moveList;
     board.getMoveList(moveList);
