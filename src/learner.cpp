@@ -138,6 +138,7 @@ void Learner::learn()
             dn->backPropagate(input, correctOutput,
                 km.board.getTesuu() / static_cast<double>(NUM_CELL));
         }
+        dn->flush();
         // randomize
         Random rnd;
         random_shuffle(kyokumen.begin(), kyokumen.end(), rnd);
