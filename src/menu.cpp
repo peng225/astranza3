@@ -15,48 +15,23 @@ std::shared_ptr<DeepNetwork> dn[NUM_DN_OBJ];
 void init()
 {
     for(int i = 0; i < NUM_DN_OBJ; i++){
-        menu::dn[i] = std::make_shared<DeepNetwork>();
+        dn[i] = std::make_shared<DeepNetwork>(16);
         // Construct network
         dn[i]->setInputInfo(DataSize(BOARD_SIZE, BOARD_SIZE), 2);
 
-        auto l1 = std::make_shared<ConvolutionLayer>(1, 4, 16);
-        dn[i]->addLayer(l1);
-
-        auto l1_5 = std::make_shared<StandardizeLayer>();
-        dn[i]->addLayer(l1_5);
-
-        auto l2 = std::make_shared<ReLULayer>();
-        dn[i]->addLayer(l2);
-
-        auto l3 = std::make_shared<PoolingLayer>(1, 3);
-        dn[i]->addLayer(l3);
-
-        auto l4 = std::make_shared<ConvolutionLayer>(1, 3, 32);
-        dn[i]->addLayer(l4);
-
-        auto l4_5 = std::make_shared<StandardizeLayer>();
-        dn[i]->addLayer(l4_5);
-
-        auto l5 = std::make_shared<ReLULayer>();
-        dn[i]->addLayer(l5);
-
-        auto l6 = std::make_shared<PoolingLayer>(1, 2);
-        dn[i]->addLayer(l6);
-
-        auto l7 = std::make_shared<FullConnectLayer>(DataSize(48, 1));
-        dn[i]->addLayer(l7);
-
-        auto l7_5 = std::make_shared<StandardizeLayer>();
-        dn[i]->addLayer(l7_5);
-
-        auto l8 = std::make_shared<SigmoidLayer>();
-        dn[i]->addLayer(l8);
-
-        auto l9 = std::make_shared<FullConnectLayer>(DataSize(2, 1));
-        dn[i]->addLayer(l9);
-
-        auto l10 = std::make_shared<SoftmaxLayer>();
-        dn[i]->addLayer(l10);
+        dn[i]->addLayer(std::make_shared<ConvolutionLayer>(1, 4, 16));
+        dn[i]->addLayer(std::make_shared<StandardizeLayer>(4));
+        dn[i]->addLayer(std::make_shared<ReLULayer>());
+        dn[i]->addLayer(std::make_shared<PoolingLayer>(1, 3));
+        dn[i]->addLayer(std::make_shared<ConvolutionLayer>(1, 3, 32));
+        dn[i]->addLayer(std::make_shared<StandardizeLayer>(8));
+        dn[i]->addLayer(std::make_shared<ReLULayer>());
+        dn[i]->addLayer(std::make_shared<PoolingLayer>(1, 2));
+        dn[i]->addLayer(std::make_shared<FullConnectLayer>(DataSize(48, 1)));
+        dn[i]->addLayer(std::make_shared<StandardizeLayer>(1));
+        dn[i]->addLayer(std::make_shared<SigmoidLayer>());
+        dn[i]->addLayer(std::make_shared<FullConnectLayer>(DataSize(2, 1)));
+        dn[i]->addLayer(std::make_shared<SoftmaxLayer>());
     }
 }
 
