@@ -15,24 +15,24 @@
 TEST_F(PlayerTest, search)
 {
     // 定石を打たないケースも動かしたいので、適当にたくさんコールする
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
-    pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
+    //pl.search(board);
 }
 

@@ -75,3 +75,66 @@ TEST(board, toVector)
     EXPECT_EQ(0, input.at(2 * NUM_CELL - 1));
 }
 
+TEST(board, transfer)
+{
+    BitBoard pos = MSB_ONLY_64;
+    EXPECT_EQ((pos >> 1), Board::transfer(pos, Direction::RIGHT));
+
+    pos >>= 7;
+    EXPECT_EQ(0ULL, Board::transfer(pos, Direction::RIGHT));
+
+    pos = MSB_ONLY_64;
+    EXPECT_EQ(pos >> 9, Board::transfer(pos, Direction::RIGHT_DOWN));
+
+    pos >>= 9;
+    EXPECT_EQ(MSB_ONLY_64, Board::transfer(pos, Direction::LEFT_UP));
+}
+
+TEST(board, flipBBWithLTtoRDDiagonal)
+{
+    BitBoard pos = MSB_ONLY_64;
+    EXPECT_EQ(pos, Board::flipBBWithLTtoRDDiagonal(pos));
+
+    pos = 1ULL;
+    EXPECT_EQ(pos, Board::flipBBWithLTtoRDDiagonal(pos));
+
+    pos = MSB_ONLY_64;
+    pos >>= 7;
+    EXPECT_EQ(1ULL << 7, Board::flipBBWithLTtoRDDiagonal(pos));
+
+    pos = 0x123456789accdef0ULL;
+    EXPECT_EQ(pos, Board::flipBBWithLTtoRDDiagonal(Board::flipBBWithLTtoRDDiagonal(pos)));
+}
+
+TEST(board, flipBBWithRTtoLDDiagonal)
+{
+    BitBoard pos = MSB_ONLY_64;
+    EXPECT_EQ(1ULL, Board::flipBBWithRTtoLDDiagonal(pos));
+
+    pos = 1ULL;
+    EXPECT_EQ(MSB_ONLY_64, Board::flipBBWithRTtoLDDiagonal(pos));
+
+    pos = MSB_ONLY_64;
+    pos >>= 7;
+    EXPECT_EQ(pos, Board::flipBBWithRTtoLDDiagonal(pos));
+
+    pos = 0x123456789accdef0ULL;
+    EXPECT_EQ(pos, Board::flipBBWithRTtoLDDiagonal(Board::flipBBWithRTtoLDDiagonal(pos)));
+}
+
+TEST(board, flipBBMix)
+{
+    BitBoard orgPos = 0x123456789accdef0ULL;
+    BitBoard pos = orgPos;
+    pos = Board::flipBBWithLTtoRDDiagonal(pos);
+    pos = Board::flipBBWithRTtoLDDiagonal(pos);
+    pos = Board::flipBBWithLTtoRDDiagonal(pos);
+    pos = Board::flipBBWithRTtoLDDiagonal(pos);
+    EXPECT_EQ(orgPos, pos);
+
+    pos = Board::flipBBWithRTtoLDDiagonal(pos);
+    pos = Board::flipBBWithLTtoRDDiagonal(pos);
+    pos = Board::flipBBWithRTtoLDDiagonal(pos);
+    pos = Board::flipBBWithLTtoRDDiagonal(pos);
+    EXPECT_EQ(orgPos, pos);
+}
