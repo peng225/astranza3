@@ -183,10 +183,10 @@ BitBoard Player::selectMove(Board& board, bool verbose)
         if(verbose) {
           auto xy = Board::posToXY(pos);
           std::cout << "pos: (" << xy.first + 1 << ", " << xy.second + 1
-                    << "), value: " << numSelect << ", "
+                    << "), (numSelect, value): (" << numSelect << ", "
                     << (myTurn != board.getTurn() ?
                         -expandedTree[board].value :
-                         expandedTree[board].value)
+                         expandedTree[board].value) << ")"
                     << (myTurn != board.getTurn() ? "" : "(pass)")
                     << std::endl;
         }
