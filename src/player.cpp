@@ -26,7 +26,15 @@ BitBoard Player::search(Board& board, int numRollout, bool verbose)
     std::vector<BitBoard> moveList;
     board.getMoveList(moveList);
     expand(board, moveList);
-    for(int i = 0; i < numRollout; i++){
+    int loopNum;
+    if(moveList.size() == 1) {
+        // 合法手が1つしか無い場合はroll outしてもしょうがない
+        // ただし、評価値は求めたいので少なめにroll outする
+        loopNum = std::max(numRollout/16, 30);
+    } else {
+        loopNum = numRollout;
+    }
+    for(int i = 0; i < loopNum; i++){
         // rootノードには親がいないので、適当にSPACEにしておく
         expandedTreeSearch(board, State::SPACE);
         board = rootBoard;
