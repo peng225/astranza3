@@ -1,8 +1,8 @@
 # Makefile
 
 
-CFLAGS = -c -g -O3 -Wall -Wextra -std=c++14 -flto -MMD -MP -fopenmp
-FINAL_CFLAGS = -g -O3 -Wall -Wextra -std=c++14 -flto -lreadline -fopenmp -lcnn
+CFLAGS = -c -g -O3 -Wall -Wextra -std=c++17 -flto -MMD -MP -fopenmp
+FINAL_CFLAGS = -g -O3 -Wall -Wextra -std=c++17 -flto -lreadline -fopenmp -lcnn
 LDLIBS = -L/home/shinya/programs/cnn/
 
 TARGET = astranza3
@@ -18,8 +18,8 @@ DEPS = $(OBJS:.o=.d)
 INCLUDE = -I $(INC_DIR) -I /home/shinya/programs/cnn/include
 
 # for test
-TEST_CFLAGS = -c -g -O0 -Wall -Wextra -std=c++14 -MMD -MP
-TEST_FINAL_CFLAGS = libgtest.a -g -O0 -Wall -Wextra -std=c++14 -lpthread -lcnn
+TEST_CFLAGS = -c -g -O0 -Wall -Wextra -std=c++17 -MMD -MP
+TEST_FINAL_CFLAGS = libgtest.a -g -O0 -Wall -Wextra -std=c++17 -lpthread -lcnn
 TEST_LDLIBS = -L/home/shinya/programs/cnn/
 
 TEST_TARGET = unittest
