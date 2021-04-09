@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <omp.h>
 
 
 //棋譜ファイルを読んで局面を変数kyokumenに突っ込んでいき、最後にrandomize
@@ -118,17 +119,18 @@ void Learner::learn()
         return;
     }
 
-    std::vector<float> input;
-    std::vector<float> correctOutput(2);
     for(int i = 0; i < REPEAT_NUM; i++){
         std::cout << "learning iteration#: " << i << std::endl;
-        for(const auto& km : kyokumen)
+        #pragma omp parallel for
+        for(int i = 0; static_cast<size_t>(i) < kyokumen.size(); i++)
         {
-            km.board.toVector(input);
-            if(km.winner == State::BLACK){
+            std::vector<float> input;
+            std::vector<float> correctOutput(2);
+            kyokumen.at(i).board.toVector(input);
+            if(kyokumen.at(i).winner == State::BLACK){
                 correctOutput.at(0) = 1;
                 correctOutput.at(1) = 0;
-            }else if(km.winner == State::WHITE){
+            }else if(kyokumen.at(i).winner == State::WHITE){
                 correctOutput.at(0) = 0;
                 correctOutput.at(1) = 1;
             }else{
@@ -136,7 +138,7 @@ void Learner::learn()
                 correctOutput.at(1) = 0.5;
             }
             dn->backPropagate(input, correctOutput,
-                km.board.getTesuu() / static_cast<double>(NUM_CELL));
+                kyokumen.at(i).board.getTesuu() / static_cast<double>(NUM_CELL));
         }
         dn->flush();
         // randomize
@@ -146,8 +148,10 @@ void Learner::learn()
 
     std::cout << "check" << std::endl;
     int count = 0;
+    std::vector<float> input;
     for(const auto& km : kyokumen)
     {
+        std::vector<float> correctOutput(2);
         km.board.toVector(input);
         //km.board.display();
         //printVector(input);
