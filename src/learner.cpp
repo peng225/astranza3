@@ -124,7 +124,7 @@ void Learner::learn()
         for(int i = 0; static_cast<size_t>(i) < kyokumen.size(); i++)
         {
             std::vector<float> input;
-            std::vector<float> correctOutput(2);
+            std::vector<float> correctOutput(2 + NUM_CELL);
             kyokumen.at(i).board.toVector(input);
             if(kyokumen.at(i).winner == State::BLACK){
                 correctOutput.at(0) = 1;
@@ -136,6 +136,8 @@ void Learner::learn()
                 correctOutput.at(0) = 0.5;
                 correctOutput.at(1) = 0.5;
             }
+            auto xy = Board::posToXY(kyokumen.at(i).correctPos);
+            correctOutput.at(2 + xy.first + xy.second * BOARD_SIZE) = 1.0;
             dn->backPropagate(input, correctOutput,
                 kyokumen.at(i).board.getTesuu() / static_cast<double>(NUM_CELL));
         }
@@ -150,7 +152,7 @@ void Learner::learn()
     std::vector<float> input;
     for(const auto& km : kyokumen)
     {
-        std::vector<float> correctOutput(2);
+        std::vector<float> correctOutput(2 + NUM_CELL);
         km.board.toVector(input);
         //km.board.display();
         //printVector(input);
@@ -164,14 +166,19 @@ void Learner::learn()
             correctOutput.at(0) = 0.5;
             correctOutput.at(1) = 0.5;
         }
+        auto xy = Board::posToXY(km.correctPos);
+        correctOutput.at(2 + xy.first + xy.second * BOARD_SIZE) = 1.0;
 
         auto out = dn->feedInput(input);
-        assert(out.back().size() == 2);
-        std::cout << "out, cout: " << out.back().at(0) << ", " << correctOutput.at(0) << std::endl;
-        std::cout << "         : " << out.back().at(1) << ", " << correctOutput.at(1) << std::endl;
+        assert(out.back().size() == 2 + NUM_CELL);
+        std::cout << "i, out, cout: " << std::endl;
+        for(int i = 0; static_cast<size_t>(i) < out.back().size(); i++) {
+            std::cout << "         : " << i << ", " << out.back().at(i) << ", " << correctOutput.at(i) << std::endl;
+        }
+        std::cout << std::endl;
 
         count++;
-        if(count == 15) break;
+        if(count == 10) break;
     }
     std::cout << "all black input:" << std::endl;
     input.clear();
@@ -180,7 +187,7 @@ void Learner::learn()
         input.at(i) = 1;
     }
     auto out = dn->feedInput(input);
-    assert(out.back().size() == 2);
+    assert(out.back().size() == 2 + NUM_CELL);
     std::cout << "out: " << out.back().at(0) << std::endl;
     std::cout << "   : " << out.back().at(1) << std::endl;
 
@@ -191,7 +198,7 @@ void Learner::learn()
         input.at(i + NUM_CELL) = 1;
     }
     out = dn->feedInput(input);
-    assert(out.back().size() == 2);
+    assert(out.back().size() == 2 + NUM_CELL);
     std::cout << "out: " << out.back().at(0) << std::endl;
     std::cout << "   : " << out.back().at(1) << std::endl;
     std::cout << std::endl;

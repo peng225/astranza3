@@ -27,11 +27,12 @@ void init()
         dn[i]->addLayer(std::make_shared<StandardizeLayer>(8));
         dn[i]->addLayer(std::make_shared<ReLULayer>());
         dn[i]->addLayer(std::make_shared<PoolingLayer>(1, 2));
-        dn[i]->addLayer(std::make_shared<FullConnectLayer>(DataSize(48, 1)));
+        dn[i]->addLayer(std::make_shared<FullConnectLayer>(DataSize(128, 1)));
         dn[i]->addLayer(std::make_shared<StandardizeLayer>(1));
         dn[i]->addLayer(std::make_shared<SigmoidLayer>());
-        dn[i]->addLayer(std::make_shared<FullConnectLayer>(DataSize(2, 1)));
-        dn[i]->addLayer(std::make_shared<SoftmaxLayer>());
+        dn[i]->addLayer(std::make_shared<FullConnectLayer>(DataSize(2 + NUM_CELL, 1)));
+        std::vector<uint32_t> splitSoftMax = {2, NUM_CELL};
+        dn[i]->addLayer(std::make_shared<SoftmaxLayer>(splitSoftMax));
     }
 }
 

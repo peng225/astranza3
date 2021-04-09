@@ -9,15 +9,17 @@
 #include <memory>
 
 constexpr int NUM_DEFAULT_ROLLOUT = 1600;
-constexpr double PUCT = 0.5;
+constexpr float PUCT = 0.5;
 constexpr int DEFAULT_ROLLOUT_DEPTH = 4;
 
 struct ExpandedNode
 {
-    ExpandedNode() : isLeaf(true), numSelect(0), value(0){}
+    ExpandedNode(float p)
+        : isLeaf(true), numSelect(0), value(0), prob(p){}
     bool isLeaf;
     int numSelect;
-    double value;
+    float value;
+    float prob;
 };
 
 class Player

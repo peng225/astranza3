@@ -22,7 +22,7 @@ BitBoard Player::search(Board& board, int numRollout, bool verbose)
     expandThresh = static_cast<int>(0.4 * log(numRollout));
 
     Board rootBoard = board;
-    expandedTree[board] = ExpandedNode();
+    expandedTree.emplace(board, ExpandedNode(1.0));
     std::vector<BitBoard> moveList;
     board.getMoveList(moveList);
     expand(board, moveList);
@@ -52,22 +52,28 @@ double Player::getScore(const Board& board, int numTotalSelect,
                         State parentTurn) const
 {
     auto node = &expandedTree.at(board);
-    double bias = PUCT * sqrt(numTotalSelect) / (node->numSelect + 1);
+    double bias = PUCT * node->prob * sqrt(numTotalSelect) / (node->numSelect + 1);
     return (board.getTurn() != parentTurn ? -node->value : node->value)
            + bias;
 }
 
 void Player::expand(Board& board, const std::vector<BitBoard>& moveList)
 {
-    assert(expandedTree[board].isLeaf);
+    assert(expandedTree.at(board).isLeaf);
     if(board.isEnd()){
         return;
     }
 
-    expandedTree[board].isLeaf = false;
+    expandedTree.at(board).isLeaf = false;
+    std::vector<float> input;
+    board.toVector(input);
+    auto out = dn->feedInput(input);
+    assert(out.back().size() == 2 + NUM_CELL);
     for(const auto& pos : moveList){
+        auto xy = Board::posToXY(pos);
+        auto prob = out.back().at(2 + xy.first + xy.second * BOARD_SIZE);
         auto revPattern = board.putStone(pos);
-        expandedTree[board] = ExpandedNode();
+        expandedTree.emplace(board, ExpandedNode(prob));
         board.undo(pos, revPattern);
     }
 }
@@ -76,7 +82,7 @@ double Player::expandedTreeSearch(Board& board, State parentTurn)
 {
     assert(expandedTree.find(board) != std::end(expandedTree));
     double value;
-    auto node = &expandedTree[board];
+    auto node = &expandedTree.at(board);
     node->numSelect++;
 
     // if(8 <= depth){
@@ -162,7 +168,7 @@ double Player::rollout(Board& board)
         board.toVector(input);
         assert(dn != nullptr);
         auto out = dn->feedInput(input);
-        assert(out.back().size() == 2);
+        assert(out.back().size() == 2 + NUM_CELL);
         if(orgTurn == State::BLACK){
             return out.back().at(0) - out.back().at(1);
         }else{
@@ -183,7 +189,7 @@ BitBoard Player::selectMove(Board& board, bool verbose)
         auto revPattern = board.putStone(pos);
         assert(revPattern != 0);
         assert(expandedTree.find(board) != std::end(expandedTree));
-        auto numSelect = expandedTree[board].numSelect;
+        auto numSelect = expandedTree.at(board).numSelect;
         if(maxNumSelect < numSelect){
             maxNumSelect = numSelect;
             selectedPos = pos;
@@ -193,8 +199,8 @@ BitBoard Player::selectMove(Board& board, bool verbose)
           std::cout << "pos: (" << xy.first + 1 << ", " << xy.second + 1
                     << "), (numSelect, value): (" << numSelect << ", "
                     << (myTurn != board.getTurn() ?
-                        -expandedTree[board].value :
-                         expandedTree[board].value) << ")"
+                        -expandedTree.at(board).value :
+                         expandedTree.at(board).value) << ")"
                     << (myTurn != board.getTurn() ? "" : "(pass)")
                     << std::endl;
         }
