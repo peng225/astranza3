@@ -82,8 +82,6 @@ void Learner::loadKifu(int numLoadKifu)
       assert(pos == orgPos);
 
       // boardを一手ずつ進めていく
-      // パスなら手順を入れ替えてやり直し
-      // if(!board.putStone(pos, true)){
       if(!board.putStone(pos)){
         auto xy = Board::posToXY(pos);
         std::cerr << "Failed to put stone!" << std::endl;
@@ -96,10 +94,11 @@ void Learner::loadKifu(int numLoadKifu)
     assert(board.getWinner() == winner);
 
     // 最後の局面は手が決まってしまっており、学習に利用できないので破棄
-    kyokumen.pop_back();
-    kyokumen.pop_back();
-    kyokumen.pop_back();
-    kyokumen.pop_back();
+    // -> 勝率の計算精度を上げるのに使えるので破棄しないことにした
+    // kyokumen.pop_back();
+    // kyokumen.pop_back();
+    // kyokumen.pop_back();
+    // kyokumen.pop_back();
     ifs.close();
   }
   
