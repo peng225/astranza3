@@ -1,9 +1,9 @@
 # Makefile
 
 
-CFLAGS = -c -g -O3 -Wall -std=c++14 -flto -MMD -MP -fopenmp
-FINAL_CFLAGS = -g -O3 -Wall -std=c++14 -flto -lreadline -fopenmp
-LDLIBS =
+CFLAGS = -c -g -O3 -Wall -Wextra -std=c++14 -flto -MMD -MP -fopenmp
+FINAL_CFLAGS = -g -O3 -Wall -Wextra -std=c++14 -flto -lreadline -fopenmp -lcnn
+LDLIBS = -L/home/shinya/programs/cnn/
 
 TARGET = astranza3
 
@@ -18,9 +18,9 @@ DEPS = $(OBJS:.o=.d)
 INCLUDE = -I $(INC_DIR)
 
 # for test
-TEST_CFLAGS = -c -g -O0 -Wall -std=c++14 -MMD -MP
-TEST_FINAL_CFLAGS = gtest_main.a -g -O0 -Wall -std=c++14 -lpthread
-TEST_LDLIBS =
+TEST_CFLAGS = -c -g -O0 -Wall -Wextra -std=c++14 -MMD -MP
+TEST_FINAL_CFLAGS = libgtest.a -g -O0 -Wall -Wextra -std=c++14 -lpthread -lcnn
+TEST_LDLIBS = -L/home/shinya/programs/cnn/
 
 TEST_TARGET = unittest
 
@@ -46,7 +46,7 @@ all: $(TARGET)
 -include $(DEPS)
 
 $(TARGET): $(OBJS)
-	$(CC) $(INCLUDE) -o $@ $^ $(FINAL_CFLAGS) $(LDLIBS)
+	$(CC) $(INCLUDE) -o $@ $^ $(LDLIBS) $(FINAL_CFLAGS)
 
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
