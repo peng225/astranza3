@@ -2,7 +2,7 @@
 
 #include "board.h"
 #include "jouseki.h"
-#include "cnn.h"
+#include <cnn.h>
 #include <unordered_map>
 #include <random>
 #include <cmath>

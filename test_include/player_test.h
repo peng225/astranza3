@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "player.h"
-#include "cnn.h"
+#include <cnn.h>
 #include <memory>
 
 class PlayerTest : public ::testing::Test

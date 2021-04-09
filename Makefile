@@ -15,7 +15,7 @@ SRCS = $(shell ls $(SRC_DIR)/*.cpp)
 OBJS = $(subst $(SRC_DIR), $(OBJ_DIR), $(SRCS:.cpp=.o))
 DEPS = $(OBJS:.o=.d)
 
-INCLUDE = -I $(INC_DIR)
+INCLUDE = -I $(INC_DIR) -I /home/shinya/programs/cnn/include
 
 # for test
 TEST_CFLAGS = -c -g -O0 -Wall -Wextra -std=c++14 -MMD -MP

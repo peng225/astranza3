@@ -1,6 +1,6 @@
 #pragma once
 #include "board.h"
-#include "cnn.h"
+#include <cnn.h>
 #include <vector>
 #include <list>
 #include <string>
