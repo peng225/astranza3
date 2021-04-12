@@ -6,7 +6,7 @@
 #include <string>
 
 const int REPEAT_NUM = 4;
-const int THRESH_NUM_CUTOFF_MOVE = 4;
+const int THRESH_NUM_CUTOFF_MOVE = 8;
 const int MAX_FILENAME = 32;
 
 

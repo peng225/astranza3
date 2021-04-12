@@ -110,7 +110,7 @@ void Learner::loadKifu(int numLoadKifu)
   std::cout << "Loaded kyokumen num: " << kyokumen.size() << std::endl;
 }
 
-
+extern bool hogeFlag;
 void Learner::learn()
 {
     if(kyokumen.empty()){
@@ -148,13 +148,14 @@ void Learner::learn()
     }
 
     std::cout << "check" << std::endl;
+    hogeFlag = true;
     int count = 0;
     std::vector<float> input;
     for(const auto& km : kyokumen)
     {
         std::vector<float> correctOutput(2 + NUM_CELL);
         km.board.toVector(input);
-        //km.board.display();
+        km.board.display();
         //printVector(input);
         if(km.winner == State::BLACK){
             correctOutput.at(0) = 1;
@@ -202,5 +203,6 @@ void Learner::learn()
     std::cout << "out: " << out.back().at(0) << std::endl;
     std::cout << "   : " << out.back().at(1) << std::endl;
     std::cout << std::endl;
+    hogeFlag = false;
 }
 

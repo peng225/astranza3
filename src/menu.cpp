@@ -322,6 +322,7 @@ void evolve(const std::list<std::string> &args)
   int othDnId = (dnId + 1) % 2;
 
   int numTestPlay = std::max(20, numOneRound/10);
+  // int numTestPlay = std::max(2, numOneRound/10);
   numTestPlay = (numTestPlay + 1) / 2 * 2;
   std::cout << "numTestPlay: " << numTestPlay << std::endl;
 
