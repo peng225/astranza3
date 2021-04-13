@@ -19,7 +19,7 @@ INCLUDE = -I $(INC_DIR) -I /home/shinya/programs/cnn/include
 
 # for test
 TEST_CFLAGS = -c -g -O0 -Wall -Wextra -std=c++17 -MMD -MP
-TEST_FINAL_CFLAGS = libgtest.a -g -O0 -Wall -Wextra -std=c++17 -lpthread -lcnn
+TEST_FINAL_CFLAGS = -g -O0 -Wall -Wextra -std=c++17 -lpthread -lcnn -lgtest_main -lgtest
 TEST_LDLIBS = -L/home/shinya/programs/cnn/
 
 TEST_TARGET = unittest
@@ -37,7 +37,7 @@ MAIN_SRC = main.cpp
 SRCS_WITHOUT_MAIN = $(shell find $(SRC_DIR) -name $(MAIN_SRC) -prune -o -name *.cpp -print)
 OBJS_WITHOUT_MAIN = $(subst $(SRC_DIR), $(OBJ_DIR), $(SRCS_WITHOUT_MAIN:.cpp=.o))
 
-TEST_INCLUDE = -I $(TEST_INC_DIR) -I .
+TEST_INCLUDE = -I $(TEST_INC_DIR)
 
 CC = g++
 
